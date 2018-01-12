@@ -250,7 +250,7 @@ class KoodousConnector(BaseConnector):
         if response:
             msg = "Successfully retrieved overview and analysis"
         else:
-            msg = "Successfully retrieved overview, though no file could be found." \
+            msg = "Successfully retrieved overview, though no file could be found. " \
                   "Either it hasn't been started or is still running"
 
         return action_result.set_status(phantom.APP_SUCCESS, msg)

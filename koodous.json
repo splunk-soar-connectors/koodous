@@ -1,7 +1,7 @@
 {
     "appid": "ff79d26f-590e-4158-ad33-1dd073ec10a5",
     "name": "Koodous",
-    "description": "This app uses Koodous to analyze APK files",
+    "description": "This app integrates with Koodous to analyze APK files",
     "type": "sandbox",
     "product_vendor": "Koodous",
     "logo": "koodous.svg",
@@ -889,7 +889,7 @@
             "action": "get report",
             "identifier": "get_report",
             "description": "Query for results of an already completed detonation",
-            "verbose": "Either the <b>sha256</b> or <b>vault_id</b> should be specified. If both are specified, the <b>vault_id</b> parameter will be used. You do not need to be the one who detonated a file to retrieve a report. As long as you know the sha256 (or, have the file in the vault) of the APK you want to analyze, you could run this action. The <b>attempts</b> parameter is how many times this action will poll for analysis results. By default, this number is only 1. If you are polling after detonate file timed out, then you will want to increase this to a higher number. There will be a 30 second interval between each polling attempt.",
+            "verbose": "Either the <b>sha256</b> or <b>vault_id</b> should be specified. If both are specified, the <b>vault_id</b> parameter will be used. You do not need to be the one who detonated a file to retrieve a report. As long as you know the sha256 (or, have the file in the vault) of the APK you want to analyze, you could run this action. The <b>attempts</b> parameter is how many times this action will poll for analysis results. By default, this number is only 1. If you are polling after <b>detonate file</b> timed out, then you will want to increase this to a higher number. There will be a 30 second interval between each polling attempt.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1463,7 +1463,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://m.facebook.com/friends/center/requests"
+                        "https://www.phantom.us/"
                     ],
                     "contains": [
                         "url"
