@@ -178,9 +178,14 @@ class KoodousConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _get_vault_file_sha256(self, action_result, vault_id):
-        file_info = Vault.get_file_info(vault_id=vault_id)
+
+        try:
+            file_info = Vault.get_file_info(vault_id=vault_id)
+        except:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid Vault ID"))
+
         if len(file_info) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "No files in vault match given ID")
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "No files in vault match given ID"))
 
         return phantom.APP_SUCCESS, file_info[0]['metadata']['sha256']
 
@@ -268,8 +273,14 @@ class KoodousConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_file(self, param):
+
         action_result = self.add_action_result(ActionResult(dict(param)))
-        attempts = int(param.get('attempts', 10))
+
+        try:
+            attempts = int(param.get('attempts', 10))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid attempts parameter value")
+
         if attempts < 1:
             attempts = 1
 
