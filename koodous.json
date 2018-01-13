@@ -498,7 +498,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
                     "data_type": "string",
                     "example_values": [
-                        "const-string v0, 'https://www.facebook.com/'"
+                        "const-string v0, 'https://www.phantom.us/'"
                     ]
                 },
                 {
@@ -586,7 +586,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://m.facebook.com/friends/center/requests"
+                        "https://www.phantom.us/"
                     ],
                     "contains": [
                         "url"
@@ -1375,7 +1375,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
                     "data_type": "string",
                     "example_values": [
-                        "const-string v0, 'https://www.facebook.com/'"
+                        "const-string v0, 'https://www.phantom.us/'"
                     ]
                 },
                 {
