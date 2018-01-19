@@ -1,0 +1,1775 @@
+{
+    "appid": "ff79d26f-590e-4158-ad33-1dd073ec10a5",
+    "name": "Koodous",
+    "description": "This app integrates with Koodous to analyze APK files",
+    "type": "sandbox",
+    "product_vendor": "Koodous",
+    "logo": "koodous.svg",
+    "logo_dark": "koodous_dark.svg",
+    "product_name": "Koodous",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
+    "app_version": "1.0.4",
+    "utctime_updated": "2018-01-15T23:27:42.000000Z",
+    "package_name": "phantom_koodous",
+    "main_module": "koodous_connector.pyc",
+    "min_phantom_version": "3.0.251",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "identifier": "detonate_file",
+            "description": "Run the file in the sandbox and retrieve the analysis results",
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "attempts": {
+                    "description": "Number of attempts to make while polling",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": 10,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.attempts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.activities",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.mobvista.msdk.shell.MVActivity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.androidtv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.metrica:api:level",
+                    "data_type": "string",
+                    "example_values": [
+                        "62"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.metrica:configuration:api:level",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.app_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Mini"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.issuerDN",
+                    "data_type": "string",
+                    "example_values": [
+                        "/C=NO/ST=Oslo/L=Oslo/O=Opera Software ASA/OU=Opera Mini/CN=Opera Android CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.not_after",
+                    "data_type": "string",
+                    "example_values": [
+                        "May 25 08:27:16 2114 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.not_before",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jun 18 08:27:16 2014 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.serial",
+                    "data_type": "string",
+                    "example_values": [
+                        "53A14D64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "D67A8C3BE07403744EF8827071A939D395DCB248"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.subjectDN",
+                    "data_type": "string",
+                    "example_values": [
+                        "/C=NO/ST=Oslo/L=Oslo/O=Opera Software ASA/OU=Opera Mini/CN=Opera Android CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.cordova",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0c96591670"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDju6hEeRO"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da75a8ff972"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgT8XqvpWJS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.displayed_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "32.0.2254.123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.filters",
+                    "data_type": "string",
+                    "example_values": [
+                        "android.intent.action.PACKAGE_REMOVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Laje$3;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v5, 'AdMob error code: '"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "onAdFailedToLoad"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lcom/opera/android/custom_views/GenericCameraView;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Landroid/hardware/Camera;->setPreviewDisplay(Landroid/view/SurfaceHolder;)V"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labe;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Ljava/security/MessageDigest;->digest([B)[B"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labv;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v1, v2, v3, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver; Landroid/content/IntentFilter;)Landroid/content/Intent;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "g"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getDeviceId()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSubscriberId()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "f"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lcom/my/target/core/parsers/b;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Landroid/content/pm/PackageManager;->getInstalledApplications(I)Ljava/util/List;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ladp;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getNetworkOperator()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "f"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lair;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v1, 'android.intent.action.CALL'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getLine1Number()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Laay;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-static Ljava/lang/Runtime;->getRuntime()Ljava/lang/Runtime;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v3, 'ro.serialno'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "<clinit>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labv;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v11, Ljava/net/URL;->openConnection()Ljava/net/URLConnection;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "La;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v0, 'https://www.phantom.us/'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.main_activity",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.android.Browser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.max_sdk_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.min_sdk_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.new_permissions",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native.permission.C2D_MESSAGE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.package_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.permissions",
+                    "data_type": "string",
+                    "example_values": [
+                        "android.permission.NFC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.providers",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.news.newsfeed.internal.cache.NewsfeedContentProvider"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.receivers",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.gcm.GcmBroadcastReceiver"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.services",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.ping.SyncAuthenticatorService"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.signature_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "META-INF/ANDROID.RSA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.target_sdk_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.urls",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.phantom.us/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.version_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "321123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.wearable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.crc32",
+                    "data_type": "string",
+                    "example_values": [
+                        "5BCCD162"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "9b57f1954c84f386554b741f57371ecf"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308cf8c3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7544622
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.scanning_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-04T22:15:07.627000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "analyzed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.analyzed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.app",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Mini"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.company",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Software ASA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.corrupted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.created_on",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1515099685
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.detected",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.displayed_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "32.0.2254.123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_apk",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "9b57f1954c84f386554b741f57371ecf"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.on_devices",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.package_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.rating",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.repo",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7544622
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.stored",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "bad-signed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.trusted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.analysis_complete",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "json"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "description": "Query for results of an already completed detonation",
+            "verbose": "Either the <b>sha256</b> or <b>vault_id</b> should be specified. If both are specified, the <b>vault_id</b> parameter will be used. You do not need to be the one who detonated a file to retrieve a report. As long as you know the sha256 (or, have the file in the vault) of the APK you want to analyze, you could run this action. The <b>attempts</b> parameter is how many times this action will poll for analysis results. By default, this number is only 1. If you are polling after <b>detonate file</b> timed out, then you will want to increase this to a higher number. There will be a 30 second interval between each polling attempt.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "sha256": {
+                    "description": "sha256 hash of file to get analysis of",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "order": 0
+                },
+                "vault_id": {
+                    "description": "Vault ID, will check if there is an existing report for this file",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ],
+                    "order": 1
+                },
+                "attempts": {
+                    "description": "Number of attempts to make while polling",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": 1,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attempts",
+                    "data_type": "string",
+                    "example_values": [
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.activities",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.mobvista.msdk.shell.MVActivity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.androidtv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.metrica:api:level",
+                    "data_type": "string",
+                    "example_values": [
+                        "62"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.metrica:configuration:api:level",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.app_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Mini"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.issuerDN",
+                    "data_type": "string",
+                    "example_values": [
+                        "/C=NO/ST=Oslo/L=Oslo/O=Opera Software ASA/OU=Opera Mini/CN=Opera Android CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.not_after",
+                    "data_type": "string",
+                    "example_values": [
+                        "May 25 08:27:16 2114 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.not_before",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jun 18 08:27:16 2014 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.serial",
+                    "data_type": "string",
+                    "example_values": [
+                        "53A14D64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "D67A8C3BE07403744EF8827071A939D395DCB248"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.certificate.subjectDN",
+                    "data_type": "string",
+                    "example_values": [
+                        "/C=NO/ST=Oslo/L=Oslo/O=Opera Software ASA/OU=Opera Mini/CN=Opera Android CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.cordova",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0c96591670"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDju6hEeRO"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da75a8ff972"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgT8XqvpWJS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.displayed_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "32.0.2254.123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.filters",
+                    "data_type": "string",
+                    "example_values": [
+                        "android.intent.action.PACKAGE_REMOVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Laje$3;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v5, 'AdMob error code: '"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "onAdFailedToLoad"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lcom/opera/android/custom_views/GenericCameraView;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Landroid/hardware/Camera;->setPreviewDisplay(Landroid/view/SurfaceHolder;)V"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.camera.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labe;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Ljava/security/MessageDigest;->digest([B)[B"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.crypto.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labv;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v1, v2, v3, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver; Landroid/content/IntentFilter;)Landroid/content/Intent;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.dynamicbroadcastreceiver.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "g"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getDeviceId()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSubscriberId()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.imsi.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "f"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lcom/my/target/core/parsers/b;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, v1, Landroid/content/pm/PackageManager;->getInstalledApplications(I)Ljava/util/List;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.installedapplications.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ladp;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getNetworkOperator()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.mcc.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "f"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lair;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v1, 'android.intent.action.CALL'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonecall.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getLine1Number()Ljava/lang/String;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.phonenumber.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Laay;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-static Ljava/lang/Runtime;->getRuntime()Ljava/lang/Runtime;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.runbinary.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lafo;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v3, 'ro.serialno'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.serialno.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "<clinit>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Labv;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "invoke-virtual v11, Ljava/net/URL;->openConnection()Ljava/net/URLConnection;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.socket.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.class",
+                    "data_type": "string",
+                    "example_values": [
+                        "La;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "const-string v0, 'https://www.phantom.us/'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.main_activity",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.android.Browser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.max_sdk_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.min_sdk_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.new_permissions",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native.permission.C2D_MESSAGE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.package_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.permissions",
+                    "data_type": "string",
+                    "example_values": [
+                        "android.permission.NFC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.providers",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.news.newsfeed.internal.cache.NewsfeedContentProvider"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.receivers",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.gcm.GcmBroadcastReceiver"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.services",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.android.ping.SyncAuthenticatorService"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.signature_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "META-INF/ANDROID.RSA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.target_sdk_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.urls",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.phantom.us/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.version_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "321123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.wearable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.crc32",
+                    "data_type": "string",
+                    "example_values": [
+                        "5BCCD162"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "9b57f1954c84f386554b741f57371ecf"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308cf8c3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7544622
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.target.file.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.scanning_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-04T22:15:07.627000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "analyzed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.analyzed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.app",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Mini"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.company",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opera Software ASA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.corrupted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.created_on",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1515099685
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.detected",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.displayed_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "32.0.2254.123747"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_apk",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "9b57f1954c84f386554b741f57371ecf"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.on_devices",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.package_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.opera.mini.native"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.rating",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.repo",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7544622
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.stored",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "bad-signed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.trusted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.analysis_complete",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved overview and analysis"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "json"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
