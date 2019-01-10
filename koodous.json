@@ -9,12 +9,12 @@
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Phantom",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
+    "license": "Copyright (c) 2018-2019 Splunk Inc.",
     "app_version": "1.0.6",
     "utctime_updated": "2018-12-07T02:08:49.000000Z",
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.pyc",
-    "min_phantom_version": "3.0.251",
+    "min_phantom_version": "4.0.1068",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
