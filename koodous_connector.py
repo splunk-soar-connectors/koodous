@@ -309,9 +309,12 @@ class KoodousConnector(BaseConnector):
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        attempts = int(param.get('attempts', 1))
-        if attempts < 1:
-            attempts = 1
+        try:
+            attempts = int(param.get('attempts', 1))
+            if attempts < 1:
+                attempts = 1
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Attempts must be integer number. Error: {0}".format(str(e))), None)
 
         sha256 = param.get('sha256')
         vault_id = param.get('vault_id')
