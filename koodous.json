@@ -4,8 +4,8 @@
     "description": "This app integrates with Koodous to analyze APK files",
     "type": "sandbox",
     "product_vendor": "Koodous",
-    "logo": "koodous.svg",
-    "logo_dark": "koodous_dark.svg",
+    "logo": "logo_koodous.svg",
+    "logo_dark": "logo_koodous_dark.svg",
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Phantom",
@@ -954,8 +954,8 @@
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "contains": [
-                        "sha1",
-                        "vault id"
+                        "vault id",
+                        "sha1"
                     ]
                 },
                 {
