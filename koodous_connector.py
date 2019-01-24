@@ -1,13 +1,9 @@
 # File: koodous_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2018
+# Copyright (c) 2018-2019 Splunk Inc.
 #
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 #
 # --
 
@@ -313,9 +309,12 @@ class KoodousConnector(BaseConnector):
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        attempts = int(param.get('attempts', 1))
-        if attempts < 1:
-            attempts = 1
+        try:
+            attempts = int(param.get('attempts', 1))
+            if attempts < 1:
+                attempts = 1
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Attempts must be integer number. Error: {0}".format(str(e))), None)
 
         sha256 = param.get('sha256')
         vault_id = param.get('vault_id')
@@ -381,7 +380,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -391,10 +390,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))

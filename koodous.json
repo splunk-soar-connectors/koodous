@@ -4,17 +4,17 @@
     "description": "This app integrates with Koodous to analyze APK files",
     "type": "sandbox",
     "product_vendor": "Koodous",
-    "logo": "koodous.svg",
-    "logo_dark": "koodous_dark.svg",
+    "logo": "logo_koodous.svg",
+    "logo_dark": "logo_koodous_dark.svg",
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Phantom",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "app_version": "1.0.4",
-    "utctime_updated": "2018-01-15T23:27:42.000000Z",
+    "license": "Copyright (c) 2018-2019 Splunk Inc.",
+    "app_version": "1.0.8",
+    "utctime_updated": "2019-01-18T01:38:31.000000Z",
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.pyc",
-    "min_phantom_version": "3.0.251",
+    "min_phantom_version": "4.0.1068",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
@@ -954,8 +954,8 @@
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "contains": [
-                        "sha1",
-                        "vault id"
+                        "vault id",
+                        "sha1"
                     ]
                 },
                 {
