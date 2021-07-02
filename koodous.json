@@ -43,7 +43,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action.",
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. For non apk file, first time action will fail and upload on to the koodous server after that when you run action with same file, it will pass with blank info.",
             "type": "investigate",
             "read_only": true,
             "parameters": {

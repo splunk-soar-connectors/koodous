@@ -347,7 +347,7 @@ class KoodousConnector(BaseConnector):
         sha256 = param.get('sha256')
         vault_id = param.get('vault_id')
         if vault_id:
-            ret_val, sha256, vault_info = self._get_vault_file_sha256(action_result, vault_id)
+            ret_val, sha256, _ = self._get_vault_file_sha256(action_result, vault_id)
             if phantom.is_fail(ret_val):
                 return ret_val
 
