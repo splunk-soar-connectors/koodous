@@ -422,7 +422,7 @@ if __name__ == '__main__':
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: {}".format(e))
             exit(1)
 
     if len(sys.argv) < 2:
