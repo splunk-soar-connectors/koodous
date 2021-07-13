@@ -8,13 +8,17 @@
     "logo_dark": "logo_koodous_dark.svg",
     "product_name": "Koodous",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
-    "app_version": "1.0.8",
-    "utctime_updated": "2019-01-18T01:38:31.000000Z",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "app_version": "2.0.2",
+    "utctime_updated": "2021-07-13T07:53:11.000000Z",
     "package_name": "phantom_koodous",
-    "main_module": "koodous_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "koodous_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "api.koodous.com on July 2, 2021"
+    ],
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
@@ -29,7 +33,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -40,7 +43,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action.",
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the provided file is not an APK, the action will be uploaded to the Koodous server but fail on the first run. However, subsequent runs against the same non-APK file will return results with no information.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -58,8 +61,6 @@
                 "attempts": {
                     "description": "Number of attempts to make while polling",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "default": 10,
                     "order": 1
                 }
@@ -67,11 +68,19 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.attempts",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        3,
+                        14
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
@@ -79,6 +88,10 @@
                     "contains": [
                         "vault id",
                         "sha1"
+                    ],
+                    "example_values": [
+                        "a5ac7cfc8f90a146f85716c27d7527b6af17287b",
+                        "abcd7cfc8f90a146f85324527d7527b6testtest"
                     ]
                 },
                 {
@@ -149,7 +162,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.certificate.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "D67A8C3BE07403744EF8827071A939D395DCB248"
+                        "testtestE07403744EF8827071A939D3testtest"
                     ],
                     "contains": [
                         "sha1"
@@ -170,7 +183,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0c96591670"
+                        "testtest45822f127329747ebc545fec8ca33301a1416a8e0e714e0ctesttest"
                     ],
                     "contains": [
                         "sha256"
@@ -180,14 +193,14 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDju6hEeRO"
+                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDtesttest"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da75a8ff972"
+                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da7testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -197,7 +210,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgT8XqvpWJS"
+                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgTtesttest"
                     ]
                 },
                 {
@@ -498,7 +511,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
                     "data_type": "string",
                     "example_values": [
-                        "const-string v0, 'https://www.phantom.us/'"
+                        "const-string v0, 'https://www.test.us/'"
                     ]
                 },
                 {
@@ -586,7 +599,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.phantom.us/"
+                        "https://www.test.us/"
                     ],
                     "contains": [
                         "url"
@@ -675,6 +688,80 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
+                    "data_type": "string",
+                    "example_value": [
+                        "/data/app/io.selendroid.testapp-1.apk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.pid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        843
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.processname",
+                    "data_type": "string",
+                    "example_value": [
+                        "io.selendroid.testapp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.tid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1073870640
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.time",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0.212098
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.name",
+                    "data_type": "string",
+                    "example_value": [
+                        "/data/app/io.selendroid.testapp-1.apk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.pid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        843
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.processname",
+                    "data_type": "string",
+                    "example_value": [
+                        "io.selendroid.testapp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.tid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1073870640
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.time",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0.249309
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scanning_date",
@@ -768,7 +855,7 @@
                     "data_path": "action_result.data.*.overview.md5",
                     "data_type": "string",
                     "example_values": [
-                        "9b57f1954c84f386554b741f57371ecf"
+                        "9b57f1954c84f386554b741ftesttest"
                     ],
                     "contains": [
                         "md5"
@@ -798,16 +885,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.overview.repo",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.overview.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                        "testtestd5bac77e93e41493bd69b427testtest"
                     ],
                     "contains": [
                         "sha1"
@@ -817,7 +901,7 @@
                     "data_path": "action_result.data.*.overview.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testtest1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -861,7 +945,7 @@
                     "data_path": "action_result.summary.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testtestc1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -896,7 +980,6 @@
                 "sha256": {
                     "description": "sha256 hash of file to get analysis of",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "sha256"
@@ -906,7 +989,6 @@
                 "vault_id": {
                     "description": "Vault ID, will check if there is an existing report for this file",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "vault id",
@@ -917,8 +999,6 @@
                 "attempts": {
                     "description": "Number of attempts to make while polling",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "default": 1,
                     "order": 2
                 }
@@ -927,17 +1007,19 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.attempts",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
-                        "10"
+                        10,
+                        7
                     ]
                 },
                 {
@@ -1026,7 +1108,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.certificate.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "D67A8C3BE07403744EF8827071A939D395DCB248"
+                        "D67A8C3BE07403744EF8827071A939D3TESTTEST"
                     ],
                     "contains": [
                         "sha1"
@@ -1047,7 +1129,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0c96591670"
+                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0ctesttest"
                     ],
                     "contains": [
                         "sha256"
@@ -1064,7 +1146,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da75a8ff972"
+                        "7f857344077ffc64899cf60bdf1dbef9776250d55f803e9a23831da7testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -1074,7 +1156,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes2.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgT8XqvpWJS"
+                        "24576:Zmh4ZRdgplwdv4X5l5mE1RQ32WpQMzMAlgHz87OUsDvp8+UTVNFkxApmkwOvS:bRQlG4X8P2WpQ0MAlgTtesttest"
                     ]
                 },
                 {
@@ -1375,7 +1457,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ssl.*.code",
                     "data_type": "string",
                     "example_values": [
-                        "const-string v0, 'https://www.phantom.us/'"
+                        "const-string v0, 'https://www.test.us/'"
                     ]
                 },
                 {
@@ -1463,7 +1545,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.phantom.us/"
+                        "https://www.test.us/"
                     ],
                     "contains": [
                         "url"
@@ -1532,7 +1614,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha512",
                     "data_type": "string",
                     "example_values": [
-                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308cf8c3"
+                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671testtest"
                     ]
                 },
                 {
@@ -1546,12 +1628,86 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj"
+                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVtesttest"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
+                    "data_type": "string",
+                    "example_value": [
+                        "/data/app/io.selendroid.testapp-1.apk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.pid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        843
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.processname",
+                    "data_type": "string",
+                    "example_value": [
+                        "io.selendroid.testapp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.tid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1073870640
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.time",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0.212098
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.name",
+                    "data_type": "string",
+                    "example_value": [
+                        "/data/app/io.selendroid.testapp-1.apk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.pid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        843
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.processname",
+                    "data_type": "string",
+                    "example_value": [
+                        "io.selendroid.testapp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.tid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1073870640
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesread.*.time",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0.249309
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scanning_date",
@@ -1564,7 +1720,7 @@
                     "data_path": "action_result.data.*.analysis.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -1675,10 +1831,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.overview.repo",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.overview.sha1",
@@ -1694,7 +1847,7 @@
                     "data_path": "action_result.data.*.overview.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -1738,7 +1891,7 @@
                     "data_path": "action_result.summary.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
