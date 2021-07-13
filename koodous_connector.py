@@ -1,6 +1,6 @@
 # File: koodous_connector.py
 #
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -11,7 +11,8 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as phrules
+from koodous_consts import *
 
 # Usage of the consts file is recommended
 import time
@@ -32,11 +33,12 @@ class KoodousConnector(BaseConnector):
         self._state = None
         self._api_key = None
         self._base_url = None
+        self._headers = None
 
     def initialize(self):
         self._state = self.load_state()
         config = self.get_config()
-        self._base_url = 'https://api.koodous.com'
+        self._base_url = KOODOUS_BASE_URL
         self._api_key = config['api_key']
         self._headers = {
             'Authorization': 'Token {}'.format(self._api_key)
@@ -46,6 +48,25 @@ class KoodousConnector(BaseConnector):
     def finalize(self):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = PHANTOM_ERR_CODE_UNAVAILABLE
+        error_msg = PHANTOM_ERR_MSG_UNAVAILABLE
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _process_empty_reponse(self, response, action_result):
 
@@ -84,7 +105,8 @@ class KoodousConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -158,7 +180,8 @@ class KoodousConnector(BaseConnector):
                 params=params
             )
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)), resp_json)
 
         # Catch a few errors here
         if r.status_code == 405:
@@ -176,20 +199,22 @@ class KoodousConnector(BaseConnector):
     def _get_vault_file_sha256(self, action_result, vault_id):
 
         try:
-            file_info = Vault.get_file_info(vault_id=vault_id)
-        except:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid Vault ID"))
+            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            vault_info = list(vault_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None, None
 
-        if len(file_info) == 0:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "No files in vault match given ID"))
+        file_sha256 = vault_info.get('metadata').get('sha256')
 
-        return phantom.APP_SUCCESS, file_info[0]['metadata']['sha256']
+        return phantom.APP_SUCCESS, file_sha256, vault_info
 
     def _upload_file(self, action_result, file_info):
         endpoint = '/apks/{sha256}/get_upload_url'.format(sha256=file_info['metadata']['sha256'])
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Error retrieving upload URL")
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_UPLOADING_URL)
 
         upload_url = response['upload_url']
 
@@ -262,10 +287,10 @@ class KoodousConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call('/apks', action_result, params=params)
         if phantom.is_fail(ret_val):
-            self.save_progress("Test connectivity failed")
+            self.save_progress(KOODOUS_ERR_TEST_CONNECTIVITY)
             return ret_val
 
-        self.save_progress("Test connectivity passed")
+        self.save_progress(KOODOUS_SUCC_TEST_CONNECTIVITY)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_file(self, param):
@@ -273,22 +298,24 @@ class KoodousConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
-            attempts = int(param.get('attempts', 10))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid attempts parameter value")
-
-        if attempts < 1:
-            attempts = 1
+            attempts = int(param.get('attempts', 1))
+            if attempts < 1:
+                attempts = 1
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(err_msg)), None)
 
         vault_id = param['vault_id']
 
-        try:
-            file_info = Vault.get_file_info(vault_id=vault_id)[0]
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid Vault ID")
+        ret_val, sha256, file_info = self._get_vault_file_sha256(action_result, vault_id)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        if not sha256:
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_GET_REPORT_PARAMS)
 
         # First check if this file has already been added
-        endpoint = '/apks/{sha256}'.format(sha256=file_info['metadata']['sha256'])
+        endpoint = '/apks/{sha256}'.format(sha256=sha256)
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             analyzed = False
@@ -300,12 +327,12 @@ class KoodousConnector(BaseConnector):
 
         # Check if we need to run analysis
         if not analyzed:
-            endpoint = '/apks/{sha256}/analyze'.format(sha256=file_info['metadata']['sha256'])
+            endpoint = '/apks/{sha256}/analyze'.format(sha256=sha256)
             ret_val, response = self._make_rest_call(endpoint, action_result)
             if phantom.is_fail(ret_val):
                 return ret_val
 
-        return self._get_report(action_result, file_info['metadata']['sha256'], attempts=attempts)
+        return self._get_report(action_result, sha256, attempts=attempts)
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -314,19 +341,18 @@ class KoodousConnector(BaseConnector):
             if attempts < 1:
                 attempts = 1
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Attempts must be integer number. Error: {0}".format(str(e))), None)
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(err_msg)), None)
 
         sha256 = param.get('sha256')
         vault_id = param.get('vault_id')
         if vault_id:
-            ret_val, sha256 = self._get_vault_file_sha256(action_result, vault_id)
+            ret_val, sha256, _ = self._get_vault_file_sha256(action_result, vault_id)
             if phantom.is_fail(ret_val):
                 return ret_val
 
         if not sha256:
-            return action_result.set_status(
-                phantom.APP_ERROR, "Must specify either 'sha256' or 'vault_id'"
-            )
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_GET_REPORT_PARAMS)
 
         return self._get_report(action_result, sha256, attempts=attempts)
 
@@ -371,15 +397,15 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -392,15 +418,15 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: {}".format(e))
             exit(1)
 
-    if (len(sys.argv) < 2):
-        print "No test json specified as input"
+    if len(sys.argv) < 2:
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -411,10 +437,10 @@ if __name__ == '__main__':
         connector = KoodousConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
