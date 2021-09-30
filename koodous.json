@@ -10,14 +10,14 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "2.0.2",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-07-13T07:53:11.000000Z",
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
-        "api.koodous.com on July 2, 2021"
+        "api.koodous.com on September 29, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -43,7 +43,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the provided file is not an APK, the action will be uploaded to the Koodous server but fail on the first run. However, subsequent runs against the same non-APK file will return results with no information.",
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -66,14 +66,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.attempts",
                     "data_type": "numeric",
@@ -952,16 +944,30 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1004,16 +1010,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.attempts",
                     "data_type": "numeric",
@@ -1895,6 +1891,14 @@
                     ],
                     "contains": [
                         "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {

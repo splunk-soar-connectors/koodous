@@ -17,6 +17,8 @@ KOODOUS_BASE_URL = 'https://api.koodous.com'
 KOODOUS_SUCC_TEST_CONNECTIVITY = "Test connectivity passed"
 
 KOODOUS_ERR_TEST_CONNECTIVITY = "Test Connectivity Failed"
-KOODOUS_ERR_INVALID_ATTEMPT_PARAM = "Attempts must be integer number. Error: {0}"
-KOODOUS_ERR_GET_REPORT_PARAMS = "Must specify either 'sha256' or 'vault_id'"
+KOODOUS_ERR_INVALID_ATTEMPT_PARAM = "Please provide a valid Integer value in the 'attempts' action parameter. Error: {0}"
+KOODOUS_ERR_GET_REPORT_PARAMS = "Please specify either 'sha256' or 'vault_id'"
 KOODOUS_ERR_UPLOADING_URL = "Error retrieving upload URL"
+KOODOUS_ERR_GET_REPORT_NOT_APK = "The provided SHA256/Vault_id does not represent an apk file. Please provide a SHA256/Vault_id which represents a valid apk file"
+KOODOUS_ERR_FILE_NOT_APK = "Please provide a valid apk file"

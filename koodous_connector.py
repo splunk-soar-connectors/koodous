@@ -14,7 +14,6 @@ from phantom.action_result import ActionResult
 import phantom.rules as phrules
 from koodous_consts import *
 
-# Usage of the consts file is recommended
 import time
 import json
 import requests
@@ -68,16 +67,16 @@ class KoodousConnector(BaseConnector):
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
-    def _process_empty_reponse(self, response, action_result):
+    def _process_empty_response(self, response, action_result):
 
-        if response.status_code:
+        if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
-        if response.status_code:
+        if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         # An html response, treat it like an error
@@ -85,6 +84,9 @@ class KoodousConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -132,7 +134,7 @@ class KoodousConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -141,7 +143,7 @@ class KoodousConnector(BaseConnector):
 
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
-            return self._process_empty_reponse(r, action_result)
+            return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
@@ -166,7 +168,7 @@ class KoodousConnector(BaseConnector):
 
         # Create a URL to connect to
         if not ignore_base_url:
-            url = self._base_url + endpoint
+            url = "{}{}".format(self._base_url, endpoint)
         else:
             url = endpoint
 
@@ -199,7 +201,7 @@ class KoodousConnector(BaseConnector):
     def _get_vault_file_sha256(self, action_result, vault_id):
 
         try:
-            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            _, _, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = list(vault_info)[0]
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
@@ -238,6 +240,9 @@ class KoodousConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             return ret_val
+
+        if not response.get('is_apk'):
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_GET_REPORT_NOT_APK)
 
         data['overview'] = response
         analysis_complete = False
@@ -323,7 +328,10 @@ class KoodousConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return ret_val
         else:
-            analyzed = response['analyzed']
+            if response.get('is_apk'):
+                analyzed = response['analyzed']
+            else:
+                return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_FILE_NOT_APK)
 
         # Check if we need to run analysis
         if not analyzed:
