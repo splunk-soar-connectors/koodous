@@ -984,7 +984,7 @@
             "read_only": true,
             "parameters": {
                 "sha256": {
-                    "description": "sha256 hash of file to get analysis of",
+                    "description": "SHA256 hash of file to get analysis of",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
