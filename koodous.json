@@ -16,6 +16,7 @@
     "main_module": "koodous_connector.py",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "api.koodous.com on July 2, 2021"
     ],
