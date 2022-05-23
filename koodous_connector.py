@@ -1,19 +1,12 @@
 # File: koodous_connector.py
 #
-# Copyright (c) 2018-2021 Splunk Inc.
+# Copyright (c) 2018-2022 Splunk Inc.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software distributed under
-# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-# either express or implied. See the License for the specific language governing permissions
-# and limitations under the License.
-#
-#
+# --
+
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -21,7 +14,6 @@ from phantom.action_result import ActionResult
 import phantom.rules as phrules
 from koodous_consts import *
 
-# Usage of the consts file is recommended
 import time
 import json
 import requests
@@ -75,16 +67,16 @@ class KoodousConnector(BaseConnector):
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
-    def _process_empty_reponse(self, response, action_result):
+    def _process_empty_response(self, response, action_result):
 
-        if response.status_code:
+        if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
-        if response.status_code:
+        if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         # An html response, treat it like an error
@@ -92,6 +84,9 @@ class KoodousConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -139,7 +134,7 @@ class KoodousConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -148,7 +143,7 @@ class KoodousConnector(BaseConnector):
 
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
-            return self._process_empty_reponse(r, action_result)
+            return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
@@ -173,7 +168,7 @@ class KoodousConnector(BaseConnector):
 
         # Create a URL to connect to
         if not ignore_base_url:
-            url = self._base_url + endpoint
+            url = "{}{}".format(self._base_url, endpoint)
         else:
             url = endpoint
 
@@ -206,7 +201,7 @@ class KoodousConnector(BaseConnector):
     def _get_vault_file_sha256(self, action_result, vault_id):
 
         try:
-            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            _, _, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = list(vault_info)[0]
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
@@ -245,6 +240,9 @@ class KoodousConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             return ret_val
+
+        if not response.get('is_apk'):
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_GET_REPORT_NOT_APK)
 
         data['overview'] = response
         analysis_complete = False
@@ -330,7 +328,10 @@ class KoodousConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return ret_val
         else:
-            analyzed = response['analyzed']
+            if response.get('is_apk'):
+                analyzed = response['analyzed']
+            else:
+                return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_FILE_NOT_APK)
 
         # Check if we need to run analysis
         if not analyzed:
