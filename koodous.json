@@ -9,15 +9,15 @@
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "license": "Copyright (c) 2018-2022 Splunk Inc.",
     "app_version": "2.1.0",
     "utctime_updated": "2021-07-13T07:53:11.000000Z",
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.py",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.2.0",
     "python_version": "3",
     "latest_tested_versions": [
-        "api.koodous.com on September 29, 2021"
+        "api.koodous.com on May 25, 2022"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
