@@ -1,6 +1,6 @@
 # File: koodous_consts.py
 #
-# Copyright (c) 2018-2021 Splunk Inc.
+# Copyright (c) 2018-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,21 @@ PHANTOM_ERR_MSG_UNAVAILABLE = "Unknown error occurred. Please check the asset co
 VAULT_ERR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
 
-KOODOUS_BASE_URL = 'https://api.koodous.com'
+KOODOUS_BASE_URL = 'https://developer.koodous.com'
+KOODOUS_ANALYSIS_ENDPOINT = '/apks/{sha256}/{analysis_type}/'
 KOODOUS_SUCC_TEST_CONNECTIVITY = "Test connectivity passed"
 
 KOODOUS_ERR_TEST_CONNECTIVITY = "Test Connectivity Failed"
-KOODOUS_ERR_INVALID_ATTEMPT_PARAM = "Attempts must be integer number. Error: {0}"
-KOODOUS_ERR_GET_REPORT_PARAMS = "Must specify either 'sha256' or 'vault_id'"
+KOODOUS_ERR_INVALID_ATTEMPT_PARAM = "Please provide a valid Integer value in the 'attempts' action parameter. Error: {0}"
+KOODOUS_ERR_GET_REPORT_PARAMS = "Please specify either 'sha256' or 'vault_id'"
 KOODOUS_ERR_UPLOADING_URL = "Error retrieving upload URL"
+
+KOODOUS_ERR_FILE_NOT_APK = "Please provide a valid apk file"
+
+KOODOUS_DEFAULT_ANALYSIS_TYPE = "all"
+KOODOUS_ANALYSIS_TYPE_LIST = ["all", "static", "dynamic", "yara"]
+KOODOUS_ANALYSIS_TYPES = {
+    "static": "is_static_analyzed",
+    "dynamic": "is_dynamic_analyzed",
+    "yara": "last_yara_analysis_at"
+}

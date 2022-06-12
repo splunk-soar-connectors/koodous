@@ -9,15 +9,15 @@
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "2.0.3",
+    "license": "Copyright (c) 2018-2022 Splunk Inc.",
+    "app_version": "2.1.0",
     "utctime_updated": "2022-01-07T20:26:51.000000Z",
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "5.2.0",
     "python_version": "3",
     "latest_tested_versions": [
-        "api.koodous.com on July 2, 2021"
+        "developer.koodous.com on May 28, 2022"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -43,7 +43,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the provided file is not an APK, the action will be uploaded to the Koodous server but fail on the first run. However, subsequent runs against the same non-APK file will return results with no information.",
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the <b>analysis_type</b> is 'yara' and <b>force_yara_analysis</b> is false, then the 'yara' analysis will only be performed if it has not been performed before. To perform yara analysis repeatedly. keep <b>force_yara_analysis</b> as true",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -58,11 +58,29 @@
                     ],
                     "order": 0
                 },
+                "analysis_type": {
+                    "description": "Type of analysis",
+                    "data_type": "string",
+                    "order": 1,
+                    "value_list": [
+                        "static",
+                        "dynamic",
+                        "yara",
+                        "all"
+                    ],
+                    "default": "all"
+                },
                 "attempts": {
                     "description": "Number of attempts to make while polling",
                     "data_type": "numeric",
                     "default": 10,
-                    "order": 1
+                    "order": 2
+                },
+                "force_yara_analysis": {
+                    "description": "Perform Yara analysis even if it is already performed",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 3
                 }
             },
             "output": [
@@ -92,6 +110,24 @@
                     "example_values": [
                         "a5ac7cfc8f90a146f85716c27d7527b6af17287b",
                         "abcd7cfc8f90a146f85324527d7527b6testtest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.analysis_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "static",
+                        "dynamic",
+                        "yara",
+                        "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.force_yara_analysis",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
                     ]
                 },
                 {
@@ -978,7 +1014,7 @@
             "read_only": true,
             "parameters": {
                 "sha256": {
-                    "description": "sha256 hash of file to get analysis of",
+                    "description": "SHA256 hash of file to get analysis of",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
