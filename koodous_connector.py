@@ -15,17 +15,18 @@
 #
 #
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-import phantom.rules as phrules
-from koodous_consts import *
-
+import json
 # Usage of the consts file is recommended
 import time
-import json
+
+import phantom.app as phantom
+import phantom.rules as phrules
 import requests
 from bs4 import BeautifulSoup
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from koodous_consts import *
 
 
 class RetVal(tuple):
@@ -44,6 +45,11 @@ class KoodousConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
+
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {"app_version": self.get_app_json().get("app_version")}
+
         config = self.get_config()
         self._base_url = KOODOUS_BASE_URL
         self._api_key = config['api_key']
@@ -62,8 +68,9 @@ class KoodousConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_code = PHANTOM_ERR_CODE_UNAVAILABLE
-        error_msg = PHANTOM_ERR_MSG_UNAVAILABLE
+
+        error_code = None
+        error_msg = KOODOUS_ERR_MSG_UNAVAILABLE
 
         try:
             if hasattr(e, "args"):
@@ -73,7 +80,7 @@ class KoodousConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception:
-            pass
+            self.debug_print("Error occurred while fetching exception information")
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -194,7 +201,8 @@ class KoodousConnector(BaseConnector):
                 headers=headers,
                 files=files,
                 verify=config.get('verify_server_cert', False),
-                params=params
+                params=params,
+                timeout=KOODOUS_DEFAULT_TIMEOUT
             )
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
@@ -221,9 +229,9 @@ class KoodousConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, message), None, None
             vault_info = list(vault_info)[0]
         except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_FILE_NOT_FOUND), None, None
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None, None
+            return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_INVALID_VAULT_ID), None, None
 
         file_sha256 = vault_info.get('metadata').get('sha256')
 
@@ -235,7 +243,7 @@ class KoodousConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_UPLOADING_URL)
 
-        upload_url = response['upload_url']
+        upload_url = response.get('upload_url')
 
         ret_val, response = self._make_rest_call(
             upload_url,
@@ -280,7 +288,9 @@ class KoodousConnector(BaseConnector):
                 })
                 return action_result.set_status(phantom.APP_SUCCESS, 'Yara analysis completed')
 
-            if analysis_type != 'yara' and (analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE or response.get(KOODOUS_ANALYSIS_TYPES[analysis_type])):
+            if (analysis_type in ['static', 'dynamic'] and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type])) or (
+                    analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE and (response.get(KOODOUS_ANALYSIS_TYPES['static']) or response.get(
+                    KOODOUS_ANALYSIS_TYPES['dynamic']))):
                 analysis_complete = True
                 endpoint = '/apks/{sha256}/analysis'.format(sha256=sha256)
                 ret_val, analysis_response = self._make_rest_call(endpoint, action_result)
@@ -320,7 +330,7 @@ class KoodousConnector(BaseConnector):
             'search': 'Whatsapp'
         }
 
-        ret_val, response = self._make_rest_call('/apks', action_result, params=params)
+        ret_val, _ = self._make_rest_call('/apks', action_result, params=params)
         if phantom.is_fail(ret_val):
             self.save_progress(KOODOUS_ERR_TEST_CONNECTIVITY)
             return ret_val
@@ -344,7 +354,8 @@ class KoodousConnector(BaseConnector):
         analysis_type = param.get('analysis_type', KOODOUS_DEFAULT_ANALYSIS_TYPE)
 
         if analysis_type not in KOODOUS_ANALYSIS_TYPE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid input from  {} in 'analysis_type' action parameter".format(KOODOUS_ANALYSIS_TYPE_LIST))
+            return action_result.set_status(phantom.APP_ERROR,
+            "Please provide a valid input from {} in 'analysis_type' action parameter".format(KOODOUS_ANALYSIS_TYPE_LIST))
 
         force_yara_analysis = param.get('force_yara_analysis', False)
 
@@ -368,28 +379,31 @@ class KoodousConnector(BaseConnector):
                 return ret_val
             endpoint = '/apks/{sha256}'.format(sha256=sha256)
             ret_val, response = self._make_rest_call(endpoint, action_result)
+            if phantom.is_fail(ret_val):
+                return ret_val
 
-        if response:
-            # Check if we need to run analysis
-            if analysis_type in ['dynamic', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['dynamic']):
-                endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_dynamic')
-                ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
-                if phantom.is_fail(ret_val):
-                    return ret_val
+        # Check if we need to run analysis
+        if analysis_type in ['dynamic', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['dynamic']):
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_dynamic')
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+            if phantom.is_fail(ret_val):
+                return ret_val
 
-            if analysis_type in ['static', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['static']):
-                endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_static')
-                ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
-                if phantom.is_fail(ret_val):
-                    return ret_val
+        if analysis_type in ['static', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['static']):
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_static')
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+            if phantom.is_fail(ret_val):
+                return ret_val
 
-            if analysis_type in ['yara', KOODOUS_DEFAULT_ANALYSIS_TYPE] and (force_yara_analysis or not response.get(KOODOUS_ANALYSIS_TYPES['yara'])):
-                last_yara_analysis_at = response.get(KOODOUS_ANALYSIS_TYPES['yara'])
-                endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_yara')
-                ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
-                if phantom.is_fail(ret_val):
-                    return ret_val
-        return self._get_report(action_result, sha256, attempts=attempts, analysis_type=analysis_type, last_yara_analysis_at=last_yara_analysis_at)
+        if analysis_type in ['yara', KOODOUS_DEFAULT_ANALYSIS_TYPE] and (force_yara_analysis or not response.get(
+                    KOODOUS_ANALYSIS_TYPES['yara'])):
+            last_yara_analysis_at = response.get(KOODOUS_ANALYSIS_TYPES['yara'])
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_yara')
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+            if phantom.is_fail(ret_val):
+                return ret_val
+        return self._get_report(action_result, sha256, attempts=attempts, analysis_type=analysis_type,
+            last_yara_analysis_at=last_yara_analysis_at)
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -438,9 +452,10 @@ class KoodousConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
-    import pudb
     import argparse
+    import sys
+
+    import pudb
 
     pudb.set_trace()
 
@@ -468,7 +483,7 @@ if __name__ == '__main__':
         try:
             print("Accessing the Login page")
             login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
-            r = requests.get(login_url, verify=verify)
+            r = requests.get(login_url, verify=verify, timeout=KOODOUS_DEFAULT_TIMEOUT)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -481,7 +496,7 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=verify, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=KOODOUS_DEFAULT_TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: {}".format(e))

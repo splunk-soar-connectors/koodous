@@ -15,6 +15,7 @@
     "package_name": "phantom_koodous",
     "main_module": "koodous_connector.py",
     "min_phantom_version": "5.2.0",
+    "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
         "developer.koodous.com on May 28, 2022"
@@ -43,9 +44,9 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the <b>analysis_type</b> is 'yara' and <b>force_yara_analysis</b> is false, then the 'yara' analysis will only be performed if it has not been performed before. To perform yara analysis repeatedly. keep <b>force_yara_analysis</b> as true",
-            "type": "investigate",
-            "read_only": true,
+            "verbose": "File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the <b>analysis_type</b> is 'yara' and <b>force_yara_analysis</b> is false, then the 'yara' analysis will only be performed if it has not been performed before. To perform yara analysis repeatedly, keep <b>force_yara_analysis</b> as true.",
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "vault_id": {
                     "description": "Vault ID of file to detonate",
@@ -77,7 +78,7 @@
                     "order": 2
                 },
                 "force_yara_analysis": {
-                    "description": "Perform Yara analysis even if it is already performed",
+                    "description": "Perform Yara analysis",
                     "data_type": "boolean",
                     "default": false,
                     "order": 3
@@ -93,26 +94,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.attempts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        3,
-                        14
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "vault id",
-                        "sha1"
-                    ],
-                    "example_values": [
-                        "a5ac7cfc8f90a146f85716c27d7527b6af17287b",
-                        "abcd7cfc8f90a146f85324527d7527b6testtest"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.analysis_type",
                     "data_type": "string",
                     "example_values": [
@@ -120,6 +101,13 @@
                         "dynamic",
                         "yara",
                         "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
                     ]
                 },
                 {
@@ -131,10 +119,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ],
+                    "example_values": [
+                        "x5ac7cfc8f90a146f85716c27d7527b6af17287x"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.analysis.androguard.activities",
                     "data_type": "string",
                     "example_values": [
-                        "com.mobvista.msdk.shell.MVActivity"
+                        "com.test.msdk.shell.MVActivity"
                     ]
                 },
                 {
@@ -163,7 +162,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.app_name",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Mini"
+                        "Test app"
                     ]
                 },
                 {
@@ -191,7 +190,10 @@
                     "data_path": "action_result.data.*.analysis.androguard.certificate.serial",
                     "data_type": "string",
                     "example_values": [
-                        "53A14D64"
+                        "testtestE07403744EF8827071A939D3testtest"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -561,7 +563,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.main_activity",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.android.Browser"
+                        "com.test.mini.abc.Browser"
                     ]
                 },
                 {
@@ -579,14 +581,14 @@
                     "data_path": "action_result.data.*.analysis.androguard.new_permissions",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native.permission.C2D_MESSAGE"
+                        "com.test.abc.native.permission.C2D_MESSAGE"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.package_name",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native"
+                        "com.test.abc.native"
                     ]
                 },
                 {
@@ -607,14 +609,14 @@
                     "data_path": "action_result.data.*.analysis.androguard.receivers",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.android.gcm.GcmBroadcastReceiver"
+                        "com.test.abc.gcm.GcmBroadcastReceiver"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.services",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.android.ping.SyncAuthenticatorService"
+                        "com.test.abc.ping.SyncAuthenticatorService"
                     ]
                 },
                 {
@@ -674,7 +676,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.md5",
                     "data_type": "string",
                     "example_values": [
-                        "9b57f1954c84f386554b741f57371ecf"
+                        "testf1954c84f386554b741f5737test"
                     ],
                     "contains": [
                         "md5"
@@ -684,7 +686,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                        "test294cd5bac77e93e41493bd69b42705e2test"
                     ],
                     "contains": [
                         "sha1"
@@ -694,7 +696,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest"
                     ],
                     "contains": [
                         "sha256"
@@ -704,7 +706,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha512",
                     "data_type": "string",
                     "example_values": [
-                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308cf8c3"
+                        "test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest"
                     ]
                 },
                 {
@@ -774,29 +776,32 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.pid",
                     "data_type": "numeric",
-                    "example_value": [
-                        843
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.processname",
                     "data_type": "string",
-                    "example_value": [
-                        "io.selendroid.testapp"
+                    "example_values": [
+                        "com.mobeasyapp.app860056677872.rr"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.tid",
                     "data_type": "numeric",
-                    "example_value": [
-                        1073870640
+                    "example_values": [
+                        4248
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.time",
                     "data_type": "numeric",
-                    "example_value": [
-                        0.249309
+                    "example_values": [
+                        121.220575094223
                     ]
                 },
                 {
@@ -810,7 +815,7 @@
                     "data_path": "action_result.data.*.analysis.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest"
                     ],
                     "contains": [
                         "sha256"
@@ -835,14 +840,14 @@
                     "data_path": "action_result.data.*.overview.app",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Mini"
+                        "Test app"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.overview.company",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Software ASA"
+                        "Test Software ASA"
                     ]
                 },
                 {
@@ -877,7 +882,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.overview.image",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "https://test.abc.com/media/apk_images/2022/06/13/logo_o8aYRh9.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.overview.is_apk",
@@ -909,7 +920,7 @@
                     "data_path": "action_result.data.*.overview.package_name",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native"
+                        "com.test.mini.native"
                     ]
                 },
                 {
@@ -974,8 +985,342 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "testfa2440d3da26b02ae03b9566test"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "test2e8a9fb24546bdd04006f62027c4ab5btest"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9326031
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zip archive data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.crc32",
+                    "data_type": "string",
+                    "example_values": [
+                        "D7FC7959"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "testbfb445d2fb7087732be295ee72267b4dcd76803ef38a90af62d9e8ae94c34a2302b2d1fc19bc0cbaf1926f26cf63f4dd7ecd2c949c419485d6f7708atest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "196608:kmu71DmUnRIeDuhTA9UZYpO65cQ0pRB5YOPYzG6roP8H9a:kmu71DlnRI80k2ZYpOWh0pH55PYhro0I"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/proc/self/cmdline"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2202398777008
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/data/app/com.test.app860056677872.rr-M42In0rnQNzdiDmPkpQy0A==/base.apk.x86_64.flock"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2224400043488
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5159
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.data",
+                    "data_type": "string",
+                    "example_values": [
+                        "6465780a3033350011a7186f0d0d68406807fc907b3069a9a9bc0ac76e4ef2f0f0f933007000000078563412000000000000000014f933008b58000070000000e40d00009c620100291400002c9a0100f1270000188c020094520000a0cb0300d509000040600600105f2c00e09a0700d2190800d4190800d8190800db190800df190800e6190800f1190800f8190800ff1908000a1a0800111a0800181a08001d1a0800261a08002a1a08002e1a0800331a08003b1a0800431a08004b1a0800511a0800581a08005e1a0800671a08006f1a08007a1a0800871a08008b1a0800901a0800981a0800a31a0800ac1a0800b11a0800b81a0800c21a0800ca1a0800d21a0800de1a0800ec1a0800f41a0800fc1a0800091b0800141b08002d1b0800351b08003b1b0800431b08004c1b0800521b0800591b0800611b0800691b0800711b08007b1b0800831b08008d1b0800981b0800a21b0800aa1b0800b31b0800bb1b0800c51b0800ca1b0800d11b0800da1b0800e11b0800e51b0800eb1b0800f41b0800fb1b0800021c08000f1c0800181c08001b1c08001f1c0800231c0800291c08002f1c0800351c0800391c0800411c0800451c08004a1c0800501c0800571c08005e1c0800611c08006f1c0800791c0800831c0800861c0800891c0800ab1c0800b11c0800c81c0800ea1c08000c1d08002e1d0800481d08006a1d0800881d0800a11d0800c31d0800e51d0800ff1d0800211e0800431e0800561e0800621e0800841e0800a61e0800c81e0800e91e0800011f0800161f0800381f08005a1f0800781f08007f1f0800a11f0800c31f0800e51f0800072008000b200800222008003e2008005d2008006e20080090200800b2200800d2200800e52008000721080012210800322108004a210800622108008421080095210800b7210800d1210800f321080015220800212208002b2208004d220800542208005d2208006222080084220800a6220800c8220800e92208000b2308002d2308004f23080071230800932308009b230800bd230800c1230800e3230800052408002724080049240800502408007224080088240800aa240800cc240800ee24080010250800322508004e2508005225080072250800942508009a2508009f250800bd250800df250800012608001e2608002c2608004e2608007026080092260800ae260800c4260800e6260800082708001527080037270800592708006127080083270800a5270800c7270800d6270800f82708001a280800272808003e28080059280800792808009b280800b6280800c2280800cd280800ef280800112908002229080044290800662908008829080092290800b4290800d6290800ef290800112a0800332a0800552a0800652a0800872a0800a92a0800ca2a0800d22a0800ea2a0800"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/data/user/0/com.test.app860056677872.rr/files/audience_network.dex"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2951688766479
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.com::startapp::sdk::APPLICATION_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.com::startapp::sdk::RETURN_ADS_ENABLED",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lv8ydaXWQ4WOEQ3q"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://test.abc.com/apks/test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.created_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:32:12.772734+02:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_trusted",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.updated_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:32:12.772757+02:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_detected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.votes_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_corrupted",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_installed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.matches_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.comments_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_static_analyzed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_dynamic_analyzed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.last_yara_analysis_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:52:46.967913+02:00"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.analysis_complete",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.sha256",
@@ -989,15 +1334,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved overview and analysis"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1062,7 +1416,7 @@
                     "data_path": "action_result.parameter.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest"
                     ],
                     "contains": [
                         "sha256"
@@ -1080,7 +1434,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.activities",
                     "data_type": "string",
                     "example_values": [
-                        "com.mobvista.msdk.shell.MVActivity"
+                        "com.test.msdk.shell.MVActivity"
                     ]
                 },
                 {
@@ -1109,7 +1463,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.app_name",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Mini"
+                        "Test app"
                     ]
                 },
                 {
@@ -1137,14 +1491,17 @@
                     "data_path": "action_result.data.*.analysis.androguard.certificate.serial",
                     "data_type": "string",
                     "example_values": [
-                        "53A14D64"
+                        "testtestE07403744EF8827071A939D3testtest"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.certificate.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "D67A8C3BE07403744EF8827071A939D3TESTTEST"
+                        "testtestE07403744EF8827071A939D3testtest"
                     ],
                     "contains": [
                         "sha1"
@@ -1165,7 +1522,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "4e445fb945822f127329747ebc545fec8ca33301a1416a8e0e714e0ctesttest"
+                        "testtest45822f127329747ebc545fec8ca33301a1416a8e0e714e0ctesttest"
                     ],
                     "contains": [
                         "sha256"
@@ -1175,7 +1532,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.dexes.classes.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDju6hEeRO"
+                        "98304:ncDdVScJfr4RBrv2yP+KdFi+mNUsQBbaju6hEeRxQ:ncp0wfr4RBrv2yP+KdY+iUsDtesttest"
                     ]
                 },
                 {
@@ -1507,7 +1864,7 @@
                     "data_path": "action_result.data.*.analysis.androguard.main_activity",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.android.Browser"
+                        "com.test.mini.abc.Browser"
                     ]
                 },
                 {
@@ -1525,14 +1882,14 @@
                     "data_path": "action_result.data.*.analysis.androguard.new_permissions",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native.permission.C2D_MESSAGE"
+                        "com.test.abc.native.permission.C2D_MESSAGE"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.package_name",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native"
+                        "com.test.abc.native"
                     ]
                 },
                 {
@@ -1553,14 +1910,14 @@
                     "data_path": "action_result.data.*.analysis.androguard.receivers",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.android.gcm.GcmBroadcastReceiver"
+                        "com.test.abc.gcm.GcmBroadcastReceiver"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.services",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.android.ping.SyncAuthenticatorService"
+                        "com.test.abc.ping.SyncAuthenticatorService"
                     ]
                 },
                 {
@@ -1620,7 +1977,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.md5",
                     "data_type": "string",
                     "example_values": [
-                        "9b57f1954c84f386554b741f57371ecf"
+                        "testf1954c84f386554b741f5737test"
                     ],
                     "contains": [
                         "md5"
@@ -1630,7 +1987,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                        "test294cd5bac77e93e41493bd69b42705e2test"
                     ],
                     "contains": [
                         "sha1"
@@ -1640,7 +1997,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478afe68d"
+                        "testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest"
                     ],
                     "contains": [
                         "sha256"
@@ -1650,7 +2007,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.sha512",
                     "data_type": "string",
                     "example_values": [
-                        "8b10989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671testtest"
+                        "test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest"
                     ]
                 },
                 {
@@ -1664,7 +2021,7 @@
                     "data_path": "action_result.data.*.analysis.cuckoo.target.file.ssdeep",
                     "data_type": "string",
                     "example_values": [
-                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVtesttest"
+                        "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj"
                     ]
                 },
                 {
@@ -1720,29 +2077,32 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.pid",
                     "data_type": "numeric",
-                    "example_value": [
-                        843
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.processname",
                     "data_type": "string",
-                    "example_value": [
-                        "io.selendroid.testapp"
+                    "example_values": [
+                        "com.mobeasyapp.app860056677872.rr"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.tid",
                     "data_type": "numeric",
-                    "example_value": [
-                        1073870640
+                    "example_values": [
+                        4248
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.time",
                     "data_type": "numeric",
-                    "example_value": [
-                        0.249309
+                    "example_values": [
+                        121.220575094223
                     ]
                 },
                 {
@@ -1756,7 +2116,7 @@
                     "data_path": "action_result.data.*.analysis.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
+                        "testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest"
                     ],
                     "contains": [
                         "sha256"
@@ -1781,14 +2141,14 @@
                     "data_path": "action_result.data.*.overview.app",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Mini"
+                        "Test app"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.overview.company",
                     "data_type": "string",
                     "example_values": [
-                        "Opera Software ASA"
+                        "Test Software ASA"
                     ]
                 },
                 {
@@ -1823,7 +2183,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.overview.image",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "https://test.abc.com/media/apk_images/2022/06/13/logo_o8aYRh9.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.overview.is_apk",
@@ -1837,7 +2203,7 @@
                     "data_path": "action_result.data.*.overview.md5",
                     "data_type": "string",
                     "example_values": [
-                        "9b57f1954c84f386554b741f57371ecf"
+                        "9b57f1954c84f386554b741ftesttest"
                     ],
                     "contains": [
                         "md5"
@@ -1855,7 +2221,7 @@
                     "data_path": "action_result.data.*.overview.package_name",
                     "data_type": "string",
                     "example_values": [
-                        "com.opera.mini.native"
+                        "com.test.mini.native"
                     ]
                 },
                 {
@@ -1873,7 +2239,7 @@
                     "data_path": "action_result.data.*.overview.sha1",
                     "data_type": "string",
                     "example_values": [
-                        "21d1294cd5bac77e93e41493bd69b42705e29ebb"
+                        "testtestd5bac77e93e41493bd69b427testtest"
                     ],
                     "contains": [
                         "sha1"
@@ -1883,7 +2249,7 @@
                     "data_path": "action_result.data.*.overview.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
+                        "testtest1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -1920,14 +2286,348 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "testfa2440d3da26b02ae03b9566test"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "test2e8a9fb24546bdd04006f62027c4ab5btest"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9326031
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zip archive data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.crc32",
+                    "data_type": "string",
+                    "example_values": [
+                        "D7FC7959"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "testbfb445d2fb7087732be295ee72267b4dcd76803ef38a90af62d9e8ae94c34a2302b2d1fc19bc0cbaf1926f26cf63f4dd7ecd2c949c419485d6f7708atest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "196608:kmu71DmUnRIeDuhTA9UZYpO65cQ0pRB5YOPYzG6roP8H9a:kmu71DlnRI80k2ZYpOWh0pH55PYhro0I"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.file_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.cuckoo.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/proc/self/cmdline"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2202398777008
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesopen.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/data/app/com.test.app860056677872.rr-M42In0rnQNzdiDmPkpQy0A==/base.apk.x86_64.flock"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2224400043488
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4248
+                    ],
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.tid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5159
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.data",
+                    "data_type": "string",
+                    "example_values": [
+                        "6465780a3033350011a7186f0d0d68406807fc907b3069a9a9bc0ac76e4ef2f0f0f933007000000078563412000000000000000014f933008b58000070000000e40d00009c620100291400002c9a0100f1270000188c020094520000a0cb0300d509000040600600105f2c00e09a0700d2190800d4190800d8190800db190800df190800e6190800f1190800f8190800ff1908000a1a0800111a0800181a08001d1a0800261a08002a1a08002e1a0800331a08003b1a0800431a08004b1a0800511a0800581a08005e1a0800671a08006f1a08007a1a0800871a08008b1a0800901a0800981a0800a31a0800ac1a0800b11a0800b81a0800c21a0800ca1a0800d21a0800de1a0800ec1a0800f41a0800fc1a0800091b0800141b08002d1b0800351b08003b1b0800431b08004c1b0800521b0800591b0800611b0800691b0800711b08007b1b0800831b08008d1b0800981b0800a21b0800aa1b0800b31b0800bb1b0800c51b0800ca1b0800d11b0800da1b0800e11b0800e51b0800eb1b0800f41b0800fb1b0800021c08000f1c0800181c08001b1c08001f1c0800231c0800291c08002f1c0800351c0800391c0800411c0800451c08004a1c0800501c0800571c08005e1c0800611c08006f1c0800791c0800831c0800861c0800891c0800ab1c0800b11c0800c81c0800ea1c08000c1d08002e1d0800481d08006a1d0800881d0800a11d0800c31d0800e51d0800ff1d0800211e0800431e0800561e0800621e0800841e0800a61e0800c81e0800e91e0800011f0800161f0800381f08005a1f0800781f08007f1f0800a11f0800c31f0800e51f0800072008000b200800222008003e2008005d2008006e20080090200800b2200800d2200800e52008000721080012210800322108004a210800622108008421080095210800b7210800d1210800f321080015220800212208002b2208004d220800542208005d2208006222080084220800a6220800c8220800e92208000b2308002d2308004f23080071230800932308009b230800bd230800c1230800e3230800052408002724080049240800502408007224080088240800aa240800cc240800ee24080010250800322508004e2508005225080072250800942508009a2508009f250800bd250800df250800012608001e2608002c2608004e2608007026080092260800ae260800c4260800e6260800082708001527080037270800592708006127080083270800a5270800c7270800d6270800f82708001a280800272808003e28080059280800792808009b280800b6280800c2280800cd280800ef280800112908002229080044290800662908008829080092290800b4290800d6290800ef290800112a0800332a0800552a0800652a0800872a0800a92a0800ca2a0800d22a0800ea2a0800"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "/data/user/0/com.test.app860056677872.rr/files/audience_network.dex"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121.2951688766479
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.processname",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.test.app860056677872.rr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.com::startapp::sdk::APPLICATION_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.androguard.api_key.com::startapp::sdk::RETURN_ADS_ENABLED",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lv8ydaXWQ4WOEQ3q"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://test.abc.com/apks/test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.created_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:32:12.772734+02:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_trusted",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.updated_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:32:12.772757+02:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_detected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.votes_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_corrupted",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_installed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.matches_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.comments_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_static_analyzed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.is_dynamic_analyzed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.overview.last_yara_analysis_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-06-13T10:52:46.967913+02:00"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.analysis_complete",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.sha256",
                     "data_type": "string",
                     "example_values": [
-                        "f847a95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
+                        "testtestc1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
                     ],
                     "contains": [
                         "sha256"
@@ -1954,8 +2654,7 @@
                         1
                     ]
                 }
-            ],
-            "render": {
+            ],"render": {
                 "type": "json"
             },
             "versions": "EQ(*)"
@@ -1965,31 +2664,31 @@
         "wheel": [
             {
                 "module": "beautifulsoup4",
-                "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
+                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.5.18.1-py3-none-any.whl"
             },
             {
                 "module": "chardet",
-                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
-                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
             }
         ]
     }

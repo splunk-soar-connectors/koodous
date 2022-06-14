@@ -12,14 +12,19 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
-PHANTOM_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-PHANTOM_ERR_MSG_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
-VAULT_ERR_INVALID_VAULT_ID = "Invalid Vault ID"
-VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
+# constants relating to '_get_error_message_from_exception'
+KOODOUS_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 
+# constants relating to vault file
+KOODOUS_VAULT_ERR_INVALID_VAULT_ID = "Invalid Vault ID"
+KOODOUS_VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
+
+# constants relating to endpoints
 KOODOUS_BASE_URL = 'https://developer.koodous.com'
 KOODOUS_ANALYSIS_ENDPOINT = '/apks/{sha256}/{analysis_type}/'
+
+# constants relating to error and success messages
 KOODOUS_SUCC_TEST_CONNECTIVITY = "Test connectivity passed"
 
 KOODOUS_ERR_TEST_CONNECTIVITY = "Test Connectivity Failed"
@@ -36,3 +41,4 @@ KOODOUS_ANALYSIS_TYPES = {
     "dynamic": "is_dynamic_analyzed",
     "yara": "last_yara_analysis_at"
 }
+KOODOUS_DEFAULT_TIMEOUT = 30
