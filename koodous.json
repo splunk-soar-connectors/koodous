@@ -730,35 +730,35 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "/data/app/io.selendroid.testapp-1.apk"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.pid",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         843
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.processname",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "io.selendroid.testapp"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.tid",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         1073870640
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.time",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0.212098
                     ]
                 },
@@ -769,7 +769,7 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.name",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "/data/app/io.selendroid.testapp-1.apk"
                     ]
                 },
@@ -2031,35 +2031,35 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "/data/app/io.selendroid.testapp-1.apk"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.pid",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         843
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.processname",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "io.selendroid.testapp"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.tid",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         1073870640
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.time",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0.212098
                     ]
                 },
@@ -2070,7 +2070,7 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesread.*.name",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "/data/app/io.selendroid.testapp-1.apk"
                     ]
                 },
