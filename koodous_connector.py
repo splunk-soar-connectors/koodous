@@ -91,7 +91,7 @@ class KoodousConnector(BaseConnector):
 
     def _process_empty_response(self, response, action_result):
 
-        if response.status_code in [200, 204]:
+        if response.status_code in [200, 204, 201]:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
@@ -262,11 +262,7 @@ class KoodousConnector(BaseConnector):
 
         data = {}
 
-        endpoint = '/apks/{sha256}'.format(sha256=sha256)
-        ret_val, response = self._make_rest_call(endpoint, action_result)
-        if phantom.is_fail(ret_val):
-            return ret_val
-
+        endpoint = KOODOUD_FILE_INFO_ENDPOINT.format(sha256=sha256)
         analysis_complete = False
         analysis_response = None
         for i in range(0, attempts):
@@ -280,13 +276,8 @@ class KoodousConnector(BaseConnector):
                 return ret_val
 
             if analysis_type == 'yara' and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type]) != last_yara_analysis_at:
-                data['overview'] = response
-                action_result.add_data(data)
-                action_result.update_summary({
-                    'sha256': sha256,
-                    'analysis_complete': analysis_complete
-                })
-                return action_result.set_status(phantom.APP_SUCCESS, 'Yara analysis completed')
+                analysis_complete = True
+                break
 
             if (analysis_type in ['static', 'dynamic'] and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type])) or (
                     analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE and (response.get(KOODOUS_ANALYSIS_TYPES['static']) or response.get(
@@ -302,22 +293,21 @@ class KoodousConnector(BaseConnector):
                 # Don't sleep if there are no more attempts left
                 time.sleep(30)
 
-        data['overview'] = response
-        if analysis_type == 'yara':
-            action_result.add_data(data)
-            return action_result.set_status(phantom.APP_SUCCESS, "Yara analysis is not started ot is in progress. Please check after sometime.")
-        data['analysis'] = analysis_response
-        action_result.add_data(data)
         action_result.update_summary({
             'sha256': sha256,
             'analysis_complete': analysis_complete
         })
-
+        data['overview'] = response
         if analysis_response:
+            data['analysis'] = analysis_response
+        action_result.add_data(data)
+
+        if analysis_complete:
             msg = "Successfully retrieved overview and analysis"
         else:
             msg = "Successfully retrieved overview, though no file could be found. " \
-                  "Either it hasn't been started or is still running"
+                    "Either the {} hasn't been started or is still running".format(
+                        "analysis" if analysis_type == "all" else "{} analysis".format(analysis_type))
 
         return action_result.set_status(phantom.APP_SUCCESS, msg)
 
@@ -355,7 +345,7 @@ class KoodousConnector(BaseConnector):
 
         if analysis_type not in KOODOUS_ANALYSIS_TYPE_LIST:
             return action_result.set_status(phantom.APP_ERROR,
-            "Please provide a valid input from {} in 'analysis_type' action parameter".format(KOODOUS_ANALYSIS_TYPE_LIST))
+            "Please provide a valid input from {} in the 'analysis_type' action parameter".format(KOODOUS_ANALYSIS_TYPE_LIST))
 
         force_yara_analysis = param.get('force_yara_analysis', False)
 
@@ -371,13 +361,13 @@ class KoodousConnector(BaseConnector):
 
         last_yara_analysis_at = None
         # First check if this file has already been added
-        endpoint = '/apks/{sha256}'.format(sha256=sha256)
+        endpoint = KOODOUD_FILE_INFO_ENDPOINT.format(sha256=sha256)
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             ret_val = self._upload_file(action_result, file_info)
             if phantom.is_fail(ret_val):
                 return ret_val
-            endpoint = '/apks/{sha256}'.format(sha256=sha256)
+            endpoint = KOODOUD_FILE_INFO_ENDPOINT.format(sha256=sha256)
             ret_val, response = self._make_rest_call(endpoint, action_result)
             if phantom.is_fail(ret_val):
                 return ret_val

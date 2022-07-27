@@ -23,6 +23,7 @@ KOODOUS_VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied 
 # constants relating to endpoints
 KOODOUS_BASE_URL = 'https://developer.koodous.com'
 KOODOUS_ANALYSIS_ENDPOINT = '/apks/{sha256}/{analysis_type}/'
+KOODOUD_FILE_INFO_ENDPOINT = '/apks/{sha256}'
 
 # constants relating to error and success messages
 KOODOUS_SUCC_TEST_CONNECTIVITY = "Test connectivity passed"
