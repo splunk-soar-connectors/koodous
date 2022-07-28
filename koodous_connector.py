@@ -15,7 +15,6 @@
 #
 #
 import json
-# Usage of the consts file is recommended
 import time
 
 import phantom.app as phantom
@@ -93,7 +92,8 @@ class KoodousConnector(BaseConnector):
         if response.status_code in [200, 204, 201]:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(
+            response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -235,7 +235,7 @@ class KoodousConnector(BaseConnector):
         return phantom.APP_SUCCESS, file_sha256, vault_info
 
     def _upload_file(self, action_result, file_info):
-        endpoint = '/apks/{sha256}/get_upload_url'.format(sha256=file_info['metadata']['sha256'])
+        endpoint = KOODOUS_GET_UPLOAD_URL_ENDPOINT.format(sha256=file_info['metadata']['sha256'])
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_UPLOADING_URL)
@@ -280,7 +280,7 @@ class KoodousConnector(BaseConnector):
                     analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE and (response.get(KOODOUS_ANALYSIS_TYPES['static']) or response.get(
                     KOODOUS_ANALYSIS_TYPES['dynamic']))):
                 analysis_complete = True
-                endpoint = '/apks/{sha256}/analysis'.format(sha256=sha256)
+                endpoint = KOODOUS_ANALYSIS_RESULT_ENDPOINT.format(sha256=sha256)
                 ret_val, analysis_response = self._make_rest_call(endpoint, action_result)
                 if phantom.is_fail(ret_val):
                     return ret_val
@@ -317,7 +317,7 @@ class KoodousConnector(BaseConnector):
             'search': 'Whatsapp'
         }
 
-        ret_val, _ = self._make_rest_call('/apks', action_result, params=params)
+        ret_val, _ = self._make_rest_call(KOODOUS_APKS_ENDPOINT, action_result, params=params)
         if phantom.is_fail(ret_val):
             self.save_progress(KOODOUS_ERR_TEST_CONNECTIVITY)
             return ret_val
