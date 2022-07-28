@@ -14,7 +14,6 @@
 # and limitations under the License.
 #
 #
-# Phantom App imports
 import json
 # Usage of the consts file is recommended
 import time
@@ -225,8 +224,6 @@ class KoodousConnector(BaseConnector):
 
         try:
             success, message, vault_info = phrules.vault_info(vault_id=vault_id)
-            if not success:
-                return action_result.set_status(phantom.APP_ERROR, message), None, None
             vault_info = list(vault_info)[0]
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_FILE_NOT_FOUND), None, None

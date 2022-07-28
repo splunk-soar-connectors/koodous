@@ -18,7 +18,7 @@
     "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
-        "developer.koodous.com on May 28, 2022"
+        "developer.koodous.com on July 28, 2022"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -169,12 +169,16 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.api_key.required_amazon_package:com::amazon::application::compatibility::enforcer::sdk::library",
                     "data_type": "string",
-                    "example_value": "19000"
+                    "example_values": [
+                        "19000"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.api_key.required_amazon_package:com::amazon::device::messaging::sdk::library",
                     "data_type": "string",
-                    "example_value": "2074700"
+                    "example_values": [
+                        "2074700"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.app_name",
@@ -286,17 +290,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.class",
                     "data_type": "string",
-                    "example_value": "Lcom/admarvel/android/ads/Utils;"
+                    "example_values": [
+                        "Lcom/admarvel/android/ads/Utils;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.code",
                     "data_type": "string",
-                    "example_value": "const-string v5, 'sms_body'"
+                    "example_values": [
+                        "const-string v5, 'sms_body'"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.method",
                     "data_type": "string",
-                    "example_value": "a"
+                    "example_values": [
+                        "a"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.class",
@@ -385,17 +395,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.class",
                     "data_type": "string",
-                    "example_value": "Lcom/apprupt/sdk/CvAppInfo;"
+                    "example_values": [
+                        "Lcom/apprupt/sdk/CvAppInfo;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.code",
                     "data_type": "string",
-                    "example_value": "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSimSerialNumber()Ljava/lang/String;"
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSimSerialNumber()Ljava/lang/String;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.method",
                     "data_type": "string",
-                    "example_value": "obtainTelephonyIds"
+                    "example_values": [
+                        "obtainTelephonyIds"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.class",
@@ -862,27 +878,34 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.algorithm",
                     "data_type": "string",
-                    "example_value": "base64_decode"
+                    "example_values": [
+                        "base64_decode"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.data",
-                    "data_type": "string",
-                    "example_value": "iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABCRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOmV4aWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vZXhpZi8xLjAvIgogICAgICAgICAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+CiAgICAgICAgIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjU8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlhSZXNvbHV0aW9uPjcyPC90aWZmOlhSZXNvbHV0aW9uPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8dGlmZjpZUmVzb2x1dGlvbj43MjwvdGlmZjpZUmVzb2x1dGlvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjEwMDwvZXhpZjpQaXhlbFhEaW1lbnNpb24+CiAgICAgICAgIDxleGlmOkNvbG9yU3BhY2U+MTwvZXhpZjpDb2xvclNwYWNlPgogICAgICAgICA8ZXhpZjpQaXhlbFlEaW1lbnNpb24+MTAwPC9leGlmOlBpeGVsWURpbWVuc2lvbj4KICAgICAg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"
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.tid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.time",
                     "data_type": "numeric",
-                    "example_value": 123.2289459705353
+                    "example_values": [
+                        123.2289459705353
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
@@ -922,17 +945,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.domain",
                     "data_type": "string",
-                    "example_value": "rules.addapptr.com"
+                    "example_values": [
+                        "rules.addapptr.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.hostname",
                     "data_type": "string",
-                    "example_value": "rules.addapptr.com"
+                    "example_values": [
+                        "rules.addapptr.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.ip",
                     "data_type": "string",
-                    "example_value": "151.80.27.93"
+                    "example_values": [
+                        "151.80.27.93"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.name",
@@ -1054,10 +1083,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.data",
-                    "data_type": "string",
-                    "example_values": [
-                        "6465780a3033350011a7186f0d0d68406807fc907b3069a9a9bc0ac76e4ef2f0f0f933007000000078563412000000000000000014f933008b58000070000000e40d00009c620100291400002c9a0100f1270000188c020094520000a0cb0300d509000040600600105f2c00e09a0700d2190800d4190800d8190800db190800df190800e6190800f1190800f8190800ff1908000a1a0800111a0800181a08001d1a0800261a08002a1a08002e1a0800331a08003b1a0800431a08004b1a0800511a0800581a08005e1a0800671a08006f1a08007a1a0800871a08008b1a0800901a0800981a0800a31a0800ac1a0800b11a0800b81a0800c21a0800ca1a0800d21a0800de1a0800ec1a0800f41a0800fc1a0800091b0800141b08002d1b0800351b08003b1b0800431b08004c1b0800521b0800591b0800611b0800691b0800711b08007b1b0800831b08008d1b0800981b0800a21b0800aa1b0800b31b0800bb1b0800c51b0800ca1b0800d11b0800da1b0800e11b0800e51b0800eb1b0800f41b0800fb1b0800021c08000f1c0800181c08001b1c08001f1c0800231c0800291c08002f1c0800351c0800391c0800411c0800451c08004a1c0800501c0800571c08005e1c0800611c08006f1c0800791c0800831c0800861c0800891c0800ab1c0800b11c0800c81c0800ea1c08000c1d08002e1d0800481d08006a1d0800881d0800a11d0800c31d0800e51d0800ff1d0800211e0800431e0800561e0800621e0800841e0800a61e0800c81e0800e91e0800011f0800161f0800381f08005a1f0800781f08007f1f0800a11f0800c31f0800e51f0800072008000b200800222008003e2008005d2008006e20080090200800b2200800d2200800e52008000721080012210800322108004a210800622108008421080095210800b7210800d1210800f321080015220800212208002b2208004d220800542208005d2208006222080084220800a6220800c8220800e92208000b2308002d2308004f23080071230800932308009b230800bd230800c1230800e3230800052408002724080049240800502408007224080088240800aa240800cc240800ee24080010250800322508004e2508005225080072250800942508009a2508009f250800bd250800df250800012608001e2608002c2608004e2608007026080092260800ae260800c4260800e6260800082708001527080037270800592708006127080083270800a5270800c7270800d6270800f82708001a280800272808003e28080059280800792808009b280800b6280800c2280800cd280800ef280800112908002229080044290800662908008829080092290800b4290800d6290800ef290800112a0800332a0800552a0800652a0800872a0800a92a0800ca2a0800d22a0800ea2a0800"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.name",
@@ -1100,97 +1126,132 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.name",
                     "data_type": "string",
-                    "example_value": "monochrome_base"
+                    "example_values": [
+                        "monochrome_base"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.tid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.time",
                     "data_type": "numeric",
-                    "example_value": 122.8014578819275
+                    "example_values": [
+                        122.8014578819275
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.data",
                     "data_type": "string",
-                    "example_value": "1603030058"
+                    "example_values": [
+                        "1603030058"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.srchost",
                     "data_type": "string",
-                    "example_value": "54.36.175.146"
+                    "example_values": [
+                        "54.36.175.146"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.srcport",
                     "data_type": "numeric",
-                    "example_value": 443
+                    "example_values": [
+                        443
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.tid",
                     "data_type": "numeric",
-                    "example_value": 6224
+                    "example_values": [
+                        6224
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.time",
                     "data_type": "numeric",
-                    "example_value": 124.5965847969055
+                    "example_values": [
+                        124.5965847969055
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.data",
-                    "data_type": "string",
-                    "example_value": "504f5354202f61633f7369746569643d31303139313726706769643d36353530333126666d7469643d33393631362676697369743d4d26746d7374703d31363439323239313434333138267467743d267569643d65306437363930622d396337632d346132302d383439642d65656533343566393932643820485454502f312e310d0a4163636570742d456e636f64696e673a20677a69700d0a557365722d4167656e743a204d6f7a696c6c612f352e3020284c696e75783b20416e64726f696420393b205669727475616c426f78204275696c642f50493b20777629204170706c655765624b69742f3533372e333620284b48544d4c2c206c696b65204765636b6f292056657273696f6e2f342e30204368726f6d652f37352e302e333737302e313031204d6f62696c65205361666172692f3533372e33360d0a436f6e74656e742d4c656e6774683a203430330d0a436f6e74656e742d547970653a206170706c69636174696f6e2f782d7777772d666f726d2d75726c656e636f6465640d0a486f73743a206d6f62696c652e736d61727461647365727665722e636f6d0d0a436f6e6e656374696f6e3a204b6565702d416c6976650d0a0d0a"
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.desthost",
                     "data_type": "string",
-                    "example_value": "185.86.138.16"
+                    "example_values": [
+                        "185.86.138.16"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.destport",
                     "data_type": "numeric",
-                    "example_value": 80
+                    "example_values": [
+                        80
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.tid",
                     "data_type": "numeric",
-                    "example_value": 6239
+                    "example_values": [
+                        6239
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.time",
                     "data_type": "numeric",
-                    "example_value": 125.5912230014801
+                    "example_values": [
+                        125.5912230014801
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scanning_date",
@@ -1644,12 +1705,16 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.api_key.required_amazon_package:com::amazon::application::compatibility::enforcer::sdk::library",
                     "data_type": "string",
-                    "example_value": "19000"
+                    "example_values": [
+                        "19000"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.api_key.required_amazon_package:com::amazon::device::messaging::sdk::library",
                     "data_type": "string",
-                    "example_value": "2074700"
+                    "example_values": [
+                        "2074700"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.app_name",
@@ -1761,17 +1826,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.class",
                     "data_type": "string",
-                    "example_value": "Lcom/admarvel/android/ads/Utils;"
+                    "example_values": [
+                        "Lcom/admarvel/android/ads/Utils;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.code",
                     "data_type": "string",
-                    "example_value": "const-string v5, 'sms_body'"
+                    "example_values": [
+                        "const-string v5, 'sms_body'"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.SMS.*.method",
                     "data_type": "string",
-                    "example_value": "a"
+                    "example_values": [
+                        "a"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.ads.*.class",
@@ -1860,17 +1931,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.class",
                     "data_type": "string",
-                    "example_value": "Lcom/apprupt/sdk/CvAppInfo;"
+                    "example_values": [
+                        "Lcom/apprupt/sdk/CvAppInfo;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.code",
                     "data_type": "string",
-                    "example_value": "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSimSerialNumber()Ljava/lang/String;"
+                    "example_values": [
+                        "invoke-virtual v0, Landroid/telephony/TelephonyManager;->getSimSerialNumber()Ljava/lang/String;"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.iccid.*.method",
                     "data_type": "string",
-                    "example_value": "obtainTelephonyIds"
+                    "example_values": [
+                        "obtainTelephonyIds"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.androguard.functionalities.imei.*.class",
@@ -2337,27 +2414,34 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.algorithm",
                     "data_type": "string",
-                    "example_value": "base64_decode"
+                    "example_values": [
+                        "base64_decode"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.data",
-                    "data_type": "string",
-                    "example_value": "iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABCRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOmV4aWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vZXhpZi8xLjAvIgogICAgICAgICAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+CiAgICAgICAgIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjU8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlhSZXNvbHV0aW9uPjcyPC90aWZmOlhSZXNvbHV0aW9uPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8dGlmZjpZUmVzb2x1dGlvbj43MjwvdGlmZjpZUmVzb2x1dGlvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjEwMDwvZXhpZjpQaXhlbFhEaW1lbnNpb24+CiAgICAgICAgIDxleGlmOkNvbG9yU3BhY2U+MTwvZXhpZjpDb2xvclNwYWNlPgogICAgICAgICA8ZXhpZjpQaXhlbFlEaW1lbnNpb24+MTAwPC9leGlmOlBpeGVsWURpbWVuc2lvbj4KICAgICAgICAgPGRjOnN1YmplY3Q+CiAgICAgICAgICAgIDxyZGY6QmFnLz4KICAgICAgICAgPC9kYzpzdWJqZWN0PgogICAgICAgICA8eG1wOk1vZGlmeURhdGU+MjAxNS0xMC0yOFQxNzoxMDo3MTwveG1wOk1vZGlmeURhdGU+CiAgICAgICAgIDx4bXA6Q3JlYXRvclRvb2w+UGl4ZWxtYXRvciAzLjQ8L3htcDpDcmVhdG9yVG9vbD4KICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CoyyofQAAAm6SURBVHgB7Z1diBZVGMdNC9nWlXKpLFAiE6JAVBKp1EiXCgK/iJDuugjKEoIi6iKC6iYJCqQu6qI7CSv1RiGxEoVCzY9CyYv0YhdCi13DVTfJov/vrTPO+zHvzJk5M3Pm3Xngv+fMmfPxPM//Pec8M++8s9dN8V8GpOJcYU4Is5TvE24MQdkpl0OYUH5MGAlhWPlxwVu5zkPNBqXTYmHR/5jtWMez6u/Y/ziqdNRx/5m684UQPv2PCSsE8kUKM2i/8JVAvlQpk5CZsnyV8KhwT6leuDb4KWX3CF8LF64VF5crg5BbZN4G4QlhenGmWo10RbV3CZ8Jv1u1zFi5SELukK5PCyxN12fUu6jmVzUQS9lW4dciBi2CECKhZ4T1wtQijMphjH/U53bhU4FILjfJm5CV0nyjQOTUC0JE9pHwTV7G5EXIbVL4VYHwtReFcHmzcM61cdNcd6j+HhLeFe4UelVul2HshVxoOg2VXRLCRv2csEnwNXqSas4EG1mS+wUuNNlnMosrQm6WJu8JD2fWqHod3CeVlwjfCX9mVd8FIUzfD4S7sipT4fZcWy0XvhcuZrEjKyF3a/D3hVuzKNEjbbkJ+ojAhj+W1qYshCzQoCxTM9MO3oPtuAM9JJwQUkVgaQlhZkAGF321NHvgBh2ylx4SrGdKGkLYM1im6pkhJ0QIpCwTDghWe4otIURTbOD1niEnxAjL1wPCt0Li6MuGEK4zWKYmczQl862EjZ699ish0XWKDSHPq9PJeJ0hszMJITGz5XCSXpISwu2QF5N0WNfp6AEuHn8RRjqeDRUmubnIjcJPBKZfLek9wMMVzwpdw+GpCfrnrm1NRgJHxVTBh/iyq8QRslKte/UWelfH5HQSX+LTSOlGCBd9GyNbWpyYN2/e9N27d987Ojr6ICBPmUUXhVbNWV98im87Src95AW1eLJjK4tCjDt27Nj9AwMDXCwFcvHixavr1q37ae/evReCQg8yQ0NDM3fs2LFgxowZhPmBjI+P/7Vo0aIfTp8+fSUoTJ/5Qk0/7NQ8aobwQML6Tg1sy7Zs2TKvlQz6wOCdO3cuwAG2feZVH13QqZUMxsMGbHE0Nr7Fx20SRQhPh0Sda+ukW8HSpUtvijrf39/vDSmGDHSK0rebLVFtIsrxLT5uk05O50LmsbaaORX4QEoSMnIwHx/j6ybpRAgPsUV+SppaJzg4ePDgH3HVyiTFhowktsTZGjqPj/F1k7Ru6qzn2wRnERCb+vHjx5d0WpebNNHBpUuXrq5du7awjd6GDIKQhQsXHna0qRvTCRCeEoLApnWGrNJJZ2QwKgYQTeFsjrtJkTPFhgx0xwbHZOAKfI3PA2klhAefnQuhLZ98X0ixJSPnWdvk8zAh/Awgt6fQfSHFMzL48OPz4CcYYULY9XOVsknxkAzj78D3YUJWmLN5pmWR4jEZuDvwvSGEh6GDaZMnIfRdNCmek4FL8H3jgXRDyGJKi5SiSKkAGcbtDQ4MIfzAsnDJm5QKkYHvGxwYQgqfIYb9vEipGBlNhPBNFl/TliauSakgGfh+tjDADJnLUdniipSKkmHcPxdCCouuzKhRaVZSKk4GbpnDzUWehOh4b54aZUgax6InXy51+z7D2FL0TUwzboJ0K4S8JSxPULnQKjakTExM/I1yfX190+KU9JgMVD/AkjUrzogyztssXxDRA2Tg5lkQwmOOXooNKXEGeD4zjPp9EBL5SIqpVWbqgpSKkIGbb/SeELTMQkqFyKgOIWFSzAZOWZxQN+cvl+JUsD3fmCG2jer6OXqAJetyjv0769qEwUmiKTModX17GM/oFpFergQhhowkF32thhb54ETr2CmO/SckCxnGIRUipUEIb+/0UlyQYQyrCCkTLFljRmmfUhsyiKaSRF8VIGUMQkZ8IgJdbMjgOmP16tU/AvJxtnhOyoh3hNiSYa4zbC4ePSbFL0LSkmFmRQ+Q0iBk2BhUZpqVDKN7xUkZZsni57pdf6prjM0rdUWG0a+ipJyV/uMQghz9Lyn+r2syjAUVJIXXBAY/W2scGGOKSvMiw+hfMVKaCCl8huRNRgVJaXBglqxRGVDY9UhRZFSIFHwPB8GSRX4/f/KWoskw9ni+fAW+NzMEvXmnU65SFhnGKI9JCXwfJoRpc8oo7zotmwxjj4ek4PNguwgTgs57jOIuU1/IMDZ5RkqTz+ufRSd82rGsn0Vf0Kdol/kkuUh5P4iPv1HHNpuZgg0O33ViXIuv8XkgrUsWJz4TYm9jBz3EZJK8H6TMR3VsSEliS4w7wqfxMb5ukk6E/K4awa7fVDuHgzLJMObYkGLaOEjxMb5ukk6EUGGrkOi1pk29dTjo9n4QH8gwKichpZstpp+EKb7Fx20SRcivqrm9rXaKgk2bNp3m5V+tTVVW6HtNWsfvdGxIYQNvPY8N2NJanvIY3+LjNpnWVnKt4KSyjwuZnv09f/7839u2bftt/vz50wcHB2/gu+99+/aNrlmz5sSRI0e8eybszJkzV6TvuQ76nnT0rhNukbwptH1IVTalNeylLCwrdfBGuKDOZ/bA2+rhm6heopYsU5+Ghd8JNoP3YIovI8nA3jhCqLNZ4FvFWrJ5AB/iy67SbQ8xDS8pMyywfNWS3gMsVT/HNU9CCH2MCP3CfRzUYu2Bz9UiUdSaZMkyo3+sTCzDpnKdBh7AZ/gukSSdIXTGxcx3Ar/Y5e0PtcR7gGuNV4TE4b0NIQz/p/C9wH7i7Y9FpZsPMiYlXhLabo90U86WEPrifyodEYaEpteH67iW/zzAjHhZIBiykjSEMADsnxD4jzs1KXJCSCDjdSHVfpuWEMbnacdDwjKhXr7kBAkfVGZGKjLoIAshtEeBA8IDwmTf6NnA2TOslym1CSQrIXTEnsK/hlsg3CJMRmFGEE1ZbeCdHOWCEPol+uILF+4M3ytMJuF/gbwjJA5tuznHFSGMwXXKYeEXYYnAa7R7Wbg39bbwpYDtTsQlIUahEWW4o3mXcLsp7LH0qOx5TUi9eUf5I+77kKh2Scu5gNwoDCZt4Hm9Uen3kcAHLhfJmxCUZl95RlgvTBWqKCxJ24VPBSd7RZQTiiDEjH2HMk8LvOfc2T+MMZ3nlPLdOsHKVoGwNncpkhBjDKHxBuEJwdeN/4p02yXw3FTmUFZ9JJYyCDHKzVRmlfCocI8pLDk9pfH3CF8LTU8UFqVXmYSEbZyrA4hZIcwJnyggT1S4X2BpIl+q+EJI2AlEZIsF3oVOepvgUrgHR9jKb/pIiZy8ER8JaXUO98iYQcwcg1nKc0OTCM5A2UYERBQEJoQxgU+9wbDyXNB5K/8CGJ8RBpmJcdcAAAAASUVORK5CYII="
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.tid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.cryptousage.*.time",
                     "data_type": "numeric",
-                    "example_value": 123.2289459705353
+                    "example_values": [
+                        123.2289459705353
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dexclass.*.path",
@@ -2397,17 +2481,23 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.domain",
                     "data_type": "string",
-                    "example_value": "rules.addapptr.com"
+                    "example_values": [
+                        "rules.addapptr.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.hostname",
                     "data_type": "string",
-                    "example_value": "rules.addapptr.com"
+                    "example_values": [
+                        "rules.addapptr.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.dns.*.ip",
                     "data_type": "string",
-                    "example_value": "151.80.27.93"
+                    "example_values": [
+                        "151.80.27.93"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.filesdeleted.*.name",
@@ -2529,10 +2619,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.data",
-                    "data_type": "string",
-                    "example_values": [
-                        "6465780a3033350011a7186f0d0d68406807fc907b3069a9a9bc0ac76e4ef2f0f0f933007000000078563412000000000000000014f933008b58000070000000e40d00009c620100291400002c9a0100f1270000188c020094520000a0cb0300d509000040600600105f2c00e09a0700d2190800d4190800d8190800db190800df190800e6190800f1190800f8190800ff1908000a1a0800111a0800181a08001d1a0800261a08002a1a08002e1a0800331a08003b1a0800431a08004b1a0800511a0800581a08005e1a0800671a08006f1a08007a1a0800871a08008b1a0800901a0800981a0800a31a0800ac1a0800b11a0800b81a0800c21a0800ca1a0800d21a0800de1a0800ec1a0800f41a0800fc1a0800091b0800141b08002d1b0800351b08003b1b0800431b08004c1b0800521b0800591b0800611b0800691b0800711b08007b1b0800831b08008d1b0800981b0800a21b0800aa1b0800b31b0800bb1b0800c51b0800ca1b0800d11b0800da1b0800e11b0800e51b0800eb1b0800f41b0800fb1b0800021c08000f1c0800181c08001b1c08001f1c0800231c0800291c08002f1c0800351c0800391c0800411c0800451c08004a1c0800501c0800571c08005e1c0800611c08006f1c0800791c0800831c0800861c0800891c0800ab1c0800b11c0800c81c0800ea1c08000c1d08002e1d0800481d08006a1d0800881d0800a11d0800c31d0800e51d0800ff1d0800211e0800431e0800561e0800621e0800841e0800a61e0800c81e0800e91e0800011f0800161f0800381f08005a1f0800781f08007f1f0800a11f0800c31f0800e51f0800072008000b200800222008003e2008005d2008006e20080090200800b2200800d2200800e52008000721080012210800322108004a210800622108008421080095210800b7210800d1210800f321080015220800212208002b2208004d220800542208005d2208006222080084220800a6220800c8220800e92208000b2308002d2308004f23080071230800932308009b230800bd230800c1230800e3230800052408002724080049240800502408007224080088240800aa240800cc240800ee24080010250800322508004e2508005225080072250800942508009a2508009f250800bd250800df250800012608001e2608002c2608004e2608007026080092260800ae260800c4260800e6260800082708001527080037270800592708006127080083270800a5270800c7270800d6270800f82708001a280800272808003e28080059280800792808009b280800b6280800c2280800cd280800ef280800112908002229080044290800662908008829080092290800b4290800d6290800ef290800112a0800332a0800552a0800652a0800872a0800a92a0800ca2a0800d22a0800ea2a0800"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.fileswritten.*.name",
@@ -2575,97 +2662,132 @@
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.name",
                     "data_type": "string",
-                    "example_value": "monochrome_base"
+                    "example_values": [
+                        "monochrome_base"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.tid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.libraries.*.time",
                     "data_type": "numeric",
-                    "example_value": 122.8014578819275
+                    "example_values": [
+                        122.8014578819275
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.data",
                     "data_type": "string",
-                    "example_value": "1603030058"
+                    "example_values": [
+                        "1603030058"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.srchost",
                     "data_type": "string",
-                    "example_value": "54.36.175.146"
+                    "example_values": [
+                        "54.36.175.146"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.srcport",
                     "data_type": "numeric",
-                    "example_value": 443
+                    "example_values": [
+                        443
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.tid",
                     "data_type": "numeric",
-                    "example_value": 6224
+                    "example_values": [
+                        6224
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.recvnet.*.time",
                     "data_type": "numeric",
-                    "example_value": 124.5965847969055
+                    "example_values": [
+                        124.5965847969055
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.data",
-                    "data_type": "string",
-                    "example_value": "504f5354202f61633f7369746569643d31303139313726706769643d36353530333126666d7469643d33393631362676697369743d4d26746d7374703d31363439323239313434333138267467743d267569643d65306437363930622d396337632d346132302d383439642d65656533343566393932643820485454502f312e310d0a4163636570742d456e636f64696e673a20677a69700d0a557365722d4167656e743a204d6f7a696c6c612f352e3020284c696e75783b20416e64726f696420393b205669727475616c426f78204275696c642f50493b20777629204170706c655765624b69742f3533372e333620284b48544d4c2c206c696b65204765636b6f292056657273696f6e2f342e30204368726f6d652f37352e302e333737302e313031204d6f62696c65205361666172692f3533372e33360d0a436f6e74656e742d4c656e6774683a203430330d0a436f6e74656e742d547970653a206170706c69636174696f6e2f782d7777772d666f726d2d75726c656e636f6465640d0a486f73743a206d6f62696c652e736d61727461647365727665722e636f6d0d0a436f6e6e656374696f6e3a204b6565702d416c6976650d0a0d0a"
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.desthost",
                     "data_type": "string",
-                    "example_value": "185.86.138.16"
+                    "example_values": [
+                        "185.86.138.16"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.destport",
                     "data_type": "numeric",
-                    "example_value": 80
+                    "example_values": [
+                        80
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.pid",
                     "data_type": "numeric",
-                    "example_value": 5133
+                    "example_values": [
+                        5133
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.processname",
                     "data_type": "string",
-                    "example_value": "eu.toralarm.toralarm_wm"
+                    "example_values": [
+                        "eu.toralarm.toralarm_wm"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.tid",
                     "data_type": "numeric",
-                    "example_value": 6239
+                    "example_values": [
+                        6239
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.droidbox.sendnet.*.time",
                     "data_type": "numeric",
-                    "example_value": 125.5912230014801
+                    "example_values": [
+                        125.5912230014801
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scanning_date",
