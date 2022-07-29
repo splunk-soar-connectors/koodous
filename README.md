@@ -6,7 +6,7 @@ Connector Version: 2\.1\.0
 Product Vendor: Koodous  
 Product Name: Koodous  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.3\.0  
+Minimum Product Version: 5\.2\.0  
 
 This app integrates with Koodous to analyze APK files
 
