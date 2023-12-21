@@ -9,7 +9,7 @@
     "product_name": "Koodous",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2022 Splunk Inc.",
+    "license": "Copyright (c) 2018-2023 Splunk Inc.",
     "app_version": "2.1.1",
     "utctime_updated": "2022-01-07T20:26:51.000000Z",
     "package_name": "phantom_koodous",

@@ -1,6 +1,6 @@
 # File: koodous_connector.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,22 +68,22 @@ class KoodousConnector(BaseConnector):
         """
 
         error_code = None
-        error_msg = KOODOUS_ERR_MSG_UNAVAILABLE
+        err_msg = KOODOUS_ERR_MSG_UNAVAILABLE
 
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    err_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_msg = e.args[0]
+                    err_msg = e.args[0]
         except Exception:
             self.debug_print("Error occurred while fetching exception information")
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_msg)
+            error_text = "Error Message: {}".format(err_msg)
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, err_msg)
 
         return error_text
 
@@ -128,8 +128,8 @@ class KoodousConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)), None)
+            error_message = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(error_message)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -204,8 +204,8 @@ class KoodousConnector(BaseConnector):
                 timeout=KOODOUS_DEFAULT_TIMEOUT
             )
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)), resp_json)
+            error_message = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json)
 
         # Catch a few errors here
         if r.status_code == 405:
@@ -334,8 +334,8 @@ class KoodousConnector(BaseConnector):
             if attempts < 1:
                 attempts = 1
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(err_msg)), None)
+            error_message = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(error_message)), None)
 
         vault_id = param['vault_id']
         analysis_type = param.get('analysis_type', KOODOUS_DEFAULT_ANALYSIS_TYPE)
@@ -399,8 +399,8 @@ class KoodousConnector(BaseConnector):
             if attempts < 1:
                 attempts = 1
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(err_msg)), None)
+            error_message = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(error_message)), None)
 
         sha256 = param.get('sha256')
         vault_id = param.get('vault_id')
