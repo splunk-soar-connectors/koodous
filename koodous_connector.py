@@ -1,6 +1,6 @@
 # File: koodous_connector.py
 #
-# Copyright (c) 2018-2023 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,9 +33,8 @@ class RetVal(tuple):
 
 
 class KoodousConnector(BaseConnector):
-
     def __init__(self):
-        super(KoodousConnector, self).__init__()
+        super().__init__()
         self._state = None
         self._api_key = None
         self._base_url = None
@@ -50,10 +49,8 @@ class KoodousConnector(BaseConnector):
 
         config = self.get_config()
         self._base_url = KOODOUS_BASE_URL
-        self._api_key = config['api_key']
-        self._headers = {
-            'Authorization': 'Token {}'.format(self._api_key)
-        }
+        self._api_key = config["api_key"]
+        self._headers = {"Authorization": f"Token {self._api_key}"}
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -81,22 +78,22 @@ class KoodousConnector(BaseConnector):
             self.debug_print("Error occurred while fetching exception information")
 
         if not error_code:
-            error_text = "Error Message: {}".format(err_msg)
+            error_text = f"Error Message: {err_msg}"
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, err_msg)
+            error_text = f"Error Code: {error_code}. Error Message: {err_msg}"
 
         return error_text
 
     def _process_empty_response(self, response, action_result):
-
         if response.status_code in [200, 204, 201]:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(
-            response.status_code)), None)
+        return RetVal(
+            action_result.set_status(phantom.APP_ERROR, f"Status code: {response.status_code}. Empty response and no information in the header"),
+            None,
+        )
 
     def _process_html_response(self, response, action_result):
-
         if response.status_code:
             return RetVal(phantom.APP_SUCCESS, {})
 
@@ -109,58 +106,53 @@ class KoodousConnector(BaseConnector):
             for element in soup(["script", "style", "footer", "nav"]):
                 element.extract()
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except Exception:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
 
-        message = message.replace('{', '{{').replace('}', '}}')
+        message = message.replace("{", "{{").replace("}", "}}")
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
-
         # Try a json parse
         try:
             resp_json = r.json()
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(error_message)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {error_message}"), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Error from server. Status Code: {} Data from server: {}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-
         # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text})
-            action_result.add_debug_data({'r_headers': r.headers})
+        if hasattr(action_result, "add_debug_data"):
+            action_result.add_debug_data({"r_status_code": r.status_code})
+            action_result.add_debug_data({"r_text": r.text})
+            action_result.add_debug_data({"r_headers": r.headers})
 
         # Process each 'Content-Type' of response separately
 
         # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
+        if "json" in r.headers.get("Content-Type", ""):
             return self._process_json_response(r, action_result)
 
         # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
-        if 'html' in r.headers.get('Content-Type', ''):
+        if "html" in r.headers.get("Content-Type", ""):
             return self._process_html_response(r, action_result)
 
         # it's not content-type that is to be parsed, handle an empty response
@@ -168,13 +160,13 @@ class KoodousConnector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Can't process response from server. Status Code: {} Data from server: {}".format(
+            r.status_code, r.text.replace("{", "{{").replace("}", "}}")
+        )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, files=None, method="get", ignore_base_url=False):
-
         config = self.get_config()
 
         resp_json = None
@@ -186,11 +178,11 @@ class KoodousConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         # Create a URL to connect to
         if not ignore_base_url:
-            url = '{0}{1}'.format(self._base_url, endpoint)
+            url = f"{self._base_url}{endpoint}"
         else:
             url = endpoint
 
@@ -200,14 +192,13 @@ class KoodousConnector(BaseConnector):
                 json=data,
                 headers=headers,
                 files=files,
-                verify=config.get('verify_server_cert', False),
+                verify=config.get("verify_server_cert", False),
                 params=params,
-                timeout=KOODOUS_DEFAULT_TIMEOUT
+                timeout=KOODOUS_DEFAULT_TIMEOUT,
             )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            return RetVal(
-                action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {error_message}"), resp_json)
 
         # Catch a few errors here
         if r.status_code == 405:
@@ -223,64 +214,56 @@ class KoodousConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _get_vault_file_sha256(self, action_result, vault_id):
-
         try:
             success, message, vault_info = phrules.vault_info(vault_id=vault_id)
-            vault_info = list(vault_info)[0]
+            vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_FILE_NOT_FOUND), None, None
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_INVALID_VAULT_ID), None, None
 
-        file_sha256 = vault_info.get('metadata').get('sha256')
+        file_sha256 = vault_info.get("metadata").get("sha256")
 
         return phantom.APP_SUCCESS, file_sha256, vault_info
 
     def _upload_file(self, action_result, file_info):
-        endpoint = KOODOUS_GET_UPLOAD_URL_ENDPOINT.format(sha256=file_info['metadata']['sha256'])
+        endpoint = KOODOUS_GET_UPLOAD_URL_ENDPOINT.format(sha256=file_info["metadata"]["sha256"])
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_UPLOADING_URL)
 
-        upload_url = response.get('upload_url')
+        upload_url = response.get("upload_url")
 
         ret_val, response = self._make_rest_call(
-            upload_url,
-            action_result,
-            method='post',
-            files={'file': open(file_info['path'], 'rb')},
-            ignore_base_url=True
+            upload_url, action_result, method="post", files={"file": open(file_info["path"], "rb")}, ignore_base_url=True
         )
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Error uploading file: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, f"Error uploading file: {action_result.get_message()}")
 
         return phantom.APP_SUCCESS
 
     def _get_report(self, action_result, sha256, attempts=1, analysis_type="all", last_yara_analysis_at=None):
-
         data = {}
 
         endpoint = KOODOUD_FILE_INFO_ENDPOINT.format(sha256=sha256)
         analysis_complete = False
         analysis_response = None
         for i in range(0, attempts):
-            self.save_progress("Polling for report, on attempt {} of {}".format(
-                i + 1,
-                attempts)
-            )
+            self.save_progress(f"Polling for report, on attempt {i + 1} of {attempts}")
 
             ret_val, response = self._make_rest_call(endpoint, action_result)
             if phantom.is_fail(ret_val):
                 return ret_val
 
-            if analysis_type == 'yara' and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type]) != last_yara_analysis_at:
+            if analysis_type == "yara" and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type]) != last_yara_analysis_at:
                 analysis_complete = True
                 break
 
-            if (analysis_type in ['static', 'dynamic'] and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type])) or (
-                    analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE and (response.get(KOODOUS_ANALYSIS_TYPES['static']) or response.get(
-                    KOODOUS_ANALYSIS_TYPES['dynamic']))):
+            if (analysis_type in ["static", "dynamic"] and response.get(KOODOUS_ANALYSIS_TYPES[analysis_type])) or (
+                analysis_type == KOODOUS_DEFAULT_ANALYSIS_TYPE
+                and (response.get(KOODOUS_ANALYSIS_TYPES["static"]) or response.get(KOODOUS_ANALYSIS_TYPES["dynamic"]))
+            ):
                 analysis_complete = True
                 endpoint = KOODOUS_ANALYSIS_RESULT_ENDPOINT.format(sha256=sha256)
                 ret_val, analysis_response = self._make_rest_call(endpoint, action_result)
@@ -292,21 +275,18 @@ class KoodousConnector(BaseConnector):
                 # Don't sleep if there are no more attempts left
                 time.sleep(30)
 
-        action_result.update_summary({
-            'sha256': sha256,
-            'analysis_complete': analysis_complete
-        })
-        data['overview'] = response
+        action_result.update_summary({"sha256": sha256, "analysis_complete": analysis_complete})
+        data["overview"] = response
         if analysis_response:
-            data['analysis'] = analysis_response
+            data["analysis"] = analysis_response
         action_result.add_data(data)
 
         if analysis_complete:
             msg = "Successfully retrieved overview and analysis"
         else:
-            msg = "Successfully retrieved overview, though no file could be found. " \
-                    "Either the {} hasn't been started or is still running".format(
-                        "analysis" if analysis_type == "all" else "{} analysis".format(analysis_type))
+            msg = "Successfully retrieved overview, though no file could be found. Either the {} hasn't been started or is still running".format(
+                "analysis" if analysis_type == "all" else f"{analysis_type} analysis"
+            )
 
         return action_result.set_status(phantom.APP_SUCCESS, msg)
 
@@ -315,9 +295,7 @@ class KoodousConnector(BaseConnector):
 
         self.save_progress("Making call to validate API key...")
 
-        params = {
-            'search': 'Whatsapp'
-        }
+        params = {"search": "Whatsapp"}
 
         ret_val, _ = self._make_rest_call(KOODOUS_APKS_ENDPOINT, action_result, params=params)
         if phantom.is_fail(ret_val):
@@ -328,31 +306,31 @@ class KoodousConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_file(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
-            attempts = int(param.get('attempts', 1))
+            attempts = int(param.get("attempts", 1))
             if attempts < 1:
                 attempts = 1
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(error_message)), None)
 
-        vault_id = param['vault_id']
-        analysis_type = param.get('analysis_type', KOODOUS_DEFAULT_ANALYSIS_TYPE)
+        vault_id = param["vault_id"]
+        analysis_type = param.get("analysis_type", KOODOUS_DEFAULT_ANALYSIS_TYPE)
 
         if analysis_type not in KOODOUS_ANALYSIS_TYPE_LIST:
-            return action_result.set_status(phantom.APP_ERROR,
-            "Please provide a valid input from {} in the 'analysis_type' action parameter".format(KOODOUS_ANALYSIS_TYPE_LIST))
+            return action_result.set_status(
+                phantom.APP_ERROR, f"Please provide a valid input from {KOODOUS_ANALYSIS_TYPE_LIST} in the 'analysis_type' action parameter"
+            )
 
-        force_yara_analysis = param.get('force_yara_analysis', False)
+        force_yara_analysis = param.get("force_yara_analysis", False)
 
         ret_val, sha256, file_info = self._get_vault_file_sha256(action_result, vault_id)
         if phantom.is_fail(ret_val):
             return ret_val
 
-        if not file_info['name'].endswith(".apk"):
+        if not file_info["name"].endswith(".apk"):
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_FILE_NOT_APK)
 
         if not sha256:
@@ -372,45 +350,47 @@ class KoodousConnector(BaseConnector):
                 return ret_val
 
         # Check if we need to run analysis
-        if analysis_type in ['dynamic', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['dynamic']):
-            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_dynamic')
-            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+        if analysis_type in ["dynamic", KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES["dynamic"]):
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type="analyze_dynamic")
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method="post")
             if phantom.is_fail(ret_val):
                 return ret_val
 
-        if analysis_type in ['static', KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES['static']):
-            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_static')
-            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+        if analysis_type in ["static", KOODOUS_DEFAULT_ANALYSIS_TYPE] and not response.get(KOODOUS_ANALYSIS_TYPES["static"]):
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type="analyze_static")
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method="post")
             if phantom.is_fail(ret_val):
                 return ret_val
 
-        if analysis_type in ['yara', KOODOUS_DEFAULT_ANALYSIS_TYPE] and (force_yara_analysis or not response.get(
-                    KOODOUS_ANALYSIS_TYPES['yara'])):
-            last_yara_analysis_at = response.get(KOODOUS_ANALYSIS_TYPES['yara'])
-            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type='analyze_yara')
-            ret_val, _ = self._make_rest_call(endpoint, action_result, method='post')
+        if analysis_type in ["yara", KOODOUS_DEFAULT_ANALYSIS_TYPE] and (
+            force_yara_analysis or not response.get(KOODOUS_ANALYSIS_TYPES["yara"])
+        ):
+            last_yara_analysis_at = response.get(KOODOUS_ANALYSIS_TYPES["yara"])
+            endpoint = KOODOUS_ANALYSIS_ENDPOINT.format(sha256=sha256, analysis_type="analyze_yara")
+            ret_val, _ = self._make_rest_call(endpoint, action_result, method="post")
             if phantom.is_fail(ret_val):
                 return ret_val
-        return self._get_report(action_result, sha256, attempts=attempts, analysis_type=analysis_type,
-            last_yara_analysis_at=last_yara_analysis_at)
+        return self._get_report(
+            action_result, sha256, attempts=attempts, analysis_type=analysis_type, last_yara_analysis_at=last_yara_analysis_at
+        )
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            attempts = int(param.get('attempts', 1))
+            attempts = int(param.get("attempts", 1))
             if attempts < 1:
                 attempts = 1
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_INVALID_ATTEMPT_PARAM.format(error_message)), None)
 
-        sha256 = param.get('sha256')
-        vault_id = param.get('vault_id')
+        sha256 = param.get("sha256")
+        vault_id = param.get("vault_id")
         if vault_id:
             ret_val, sha256, file_info = self._get_vault_file_sha256(action_result, vault_id)
             if phantom.is_fail(ret_val):
                 return ret_val
-            if not file_info['name'].endswith(".apk"):
+            if not file_info["name"].endswith(".apk"):
                 return action_result.set_status(phantom.APP_ERROR, KOODOUS_ERR_FILE_NOT_APK)
 
         if not sha256:
@@ -419,7 +399,6 @@ class KoodousConnector(BaseConnector):
         return self._get_report(action_result, sha256, attempts=attempts)
 
     def handle_action(self, param):
-
         ret_val = phantom.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
@@ -427,20 +406,19 @@ class KoodousConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'test_connectivity':
+        if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == 'detonate_file':
+        elif action_id == "detonate_file":
             ret_val = self._handle_detonate_file(param)
 
-        elif action_id == 'get_report':
+        elif action_id == "get_report":
             ret_val = self._handle_get_report(param)
 
         return ret_val
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     import argparse
     import sys
 
@@ -450,10 +428,10 @@ if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
-    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument("-v", "--verify", action="store_true", help="verify", required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -463,32 +441,32 @@ if __name__ == '__main__':
     password = args.password
 
     if username is not None and password is None:
-
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if username and password:
         try:
             print("Accessing the Login page")
-            login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
+            login_url = f"{BaseConnector._get_phantom_base_url()}login"
             r = requests.get(login_url, verify=verify, timeout=KOODOUS_DEFAULT_TIMEOUT)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
-            headers['Referer'] = login_url
+            headers["Cookie"] = f"csrftoken={csrftoken}"
+            headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=KOODOUS_DEFAULT_TIMEOUT)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
-            print("Unable to get session id from the platform. Error: {}".format(e))
+            print(f"Unable to get session id from the platform. Error: {e}")
             sys.exit(1)
 
     if len(sys.argv) < 2:
@@ -504,7 +482,7 @@ if __name__ == '__main__':
         connector.print_progress_message = True
 
         if session_id is not None:
-            in_json['user_session_token'] = session_id
+            in_json["user_session_token"] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
