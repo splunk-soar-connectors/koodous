@@ -1,6 +1,6 @@
 # File: koodous_consts.py
 #
-# Copyright (c) 2018-2023 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ KOODOUS_VAULT_ERR_INVALID_VAULT_ID = "Invalid Vault ID"
 KOODOUS_VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
 
 # constants relating to endpoints
-KOODOUS_BASE_URL = 'https://developer.koodous.com'
-KOODOUS_APKS_ENDPOINT = '/apks'
-KOODOUS_ANALYSIS_ENDPOINT = '/apks/{sha256}/{analysis_type}/'
-KOODOUD_FILE_INFO_ENDPOINT = '/apks/{sha256}'
-KOODOUS_ANALYSIS_RESULT_ENDPOINT = '/apks/{sha256}/analysis'
-KOODOUS_GET_UPLOAD_URL_ENDPOINT = '/apks/{sha256}/get_upload_url'
+KOODOUS_BASE_URL = "https://developer.koodous.com"
+KOODOUS_APKS_ENDPOINT = "/apks"
+KOODOUS_ANALYSIS_ENDPOINT = "/apks/{sha256}/{analysis_type}/"
+KOODOUD_FILE_INFO_ENDPOINT = "/apks/{sha256}"
+KOODOUS_ANALYSIS_RESULT_ENDPOINT = "/apks/{sha256}/analysis"
+KOODOUS_GET_UPLOAD_URL_ENDPOINT = "/apks/{sha256}/get_upload_url"
 
 # constants relating to error and success messages
 KOODOUS_SUCC_TEST_CONNECTIVITY = "Test connectivity passed"
@@ -40,9 +40,5 @@ KOODOUS_ERR_FILE_NOT_APK = "Please provide a valid apk file"
 
 KOODOUS_DEFAULT_ANALYSIS_TYPE = "all"
 KOODOUS_ANALYSIS_TYPE_LIST = ["all", "static", "dynamic", "yara"]
-KOODOUS_ANALYSIS_TYPES = {
-    "static": "is_static_analyzed",
-    "dynamic": "is_dynamic_analyzed",
-    "yara": "last_yara_analysis_at"
-}
+KOODOUS_ANALYSIS_TYPES = {"static": "is_static_analyzed", "dynamic": "is_dynamic_analyzed", "yara": "last_yara_analysis_at"}
 KOODOUS_DEFAULT_TIMEOUT = 30
