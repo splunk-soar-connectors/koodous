@@ -173,7 +173,8 @@ class KoodousConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        headers.update(self._headers)
+        if not ignore_base_url:
+            headers.update(self._headers)
 
         try:
             request_func = getattr(requests, method)
