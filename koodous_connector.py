@@ -94,7 +94,7 @@ class KoodousConnector(BaseConnector):
         )
 
     def _process_html_response(self, response, action_result):
-        if response.status_code:
+        if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, {})
 
         # An html response, treat it like an error
@@ -282,14 +282,15 @@ class KoodousConnector(BaseConnector):
             data["analysis"] = analysis_response
         action_result.add_data(data)
 
-        if analysis_complete:
-            msg = "Successfully retrieved overview and analysis"
-        else:
-            msg = "Successfully retrieved overview, though no file could be found. Either the {} hasn't been started or is still running".format(
-                "analysis" if analysis_type == "all" else f"{analysis_type} analysis"
+        if not analysis_complete:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Polling attempts were exhausted before the {} completed".format(
+                    "analysis" if analysis_type == "all" else f"{analysis_type} analysis"
+                ),
             )
 
-        return action_result.set_status(phantom.APP_SUCCESS, msg)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved overview and analysis")
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
