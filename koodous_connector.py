@@ -216,7 +216,7 @@ class KoodousConnector(BaseConnector):
 
     def _get_vault_file_sha256(self, action_result, vault_id):
         try:
-            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            _success, _message, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, KOODOUS_VAULT_ERR_FILE_NOT_FOUND), None, None
