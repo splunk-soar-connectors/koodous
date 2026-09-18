@@ -193,7 +193,7 @@ class KoodousConnector(BaseConnector):
                 json=data,
                 headers=headers,
                 files=files,
-                verify=config.get("verify_server_cert", False),
+                verify=config.get("verify_server_cert", True),
                 params=params,
                 timeout=KOODOUS_DEFAULT_TIMEOUT,
             )
