@@ -31,6 +31,7 @@ This table lists the configuration variables required to operate Koodous. These 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **api_key** | required | password | API Key |
+**verify_server_cert** | optional | boolean | Verify server certificate |
 
 ### Supported Actions
 
