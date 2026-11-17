@@ -36,7 +36,7 @@ class GetReportParams(Params):
         primary=True,
         cef_types=["vault id", "sha1"],
     )
-    attempts: float | None = Param(
+    attempts: int | None = Param(
         description="Number of attempts to make while polling", default=1
     )
 
@@ -301,7 +301,7 @@ class AndroguardOutput(ActionOutput):
     functionalities: FunctionalitiesOutput
     main_activity: str = OutputField(example_values=["com.test.mini.abc.Browser"])
     max_sdk_version: str
-    min_sdk_version: float = OutputField(example_values=[16])
+    min_sdk_version: int = OutputField(example_values=[16])
     new_permissions: str = OutputField(
         example_values=["com.test.abc.native.permission.C2D_MESSAGE"]
     )
@@ -319,7 +319,7 @@ class AndroguardOutput(ActionOutput):
         example_values=["com.test.abc.ping.SyncAuthenticatorService"]
     )
     signature_name: str = OutputField(example_values=["META-INF/ANDROID.RSA"])
-    target_sdk_version: float = OutputField(example_values=[25])
+    target_sdk_version: int = OutputField(example_values=[25])
     urls: str = OutputField(cef_types=["url"], example_values=["https://www.test.us/"])
     version_code: str = OutputField(example_values=["321123747"])
     wearable: bool
@@ -347,7 +347,7 @@ class FileOutput(ActionOutput):
             "test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest"
         ]
     )
-    size: float = OutputField(example_values=[7544622])
+    size: int = OutputField(example_values=[7544622])
     ssdeep: str = OutputField(
         example_values=[
             "196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj"
@@ -371,15 +371,15 @@ class CryptousageOutput(ActionOutput):
     algorithm: str = OutputField(example_values=["base64_decode"])
     data: str
     processname: str = OutputField(example_values=["eu.toralarm.toralarm_wm"])
-    tid: float = OutputField(example_values=[5133])
+    tid: int = OutputField(example_values=[5133])
     time: float = OutputField(example_values=[123.2289459705353])
 
 
 class DexclassOutput(ActionOutput):
     path: str = OutputField(example_values=["/data/app/io.selendroid.testapp-1.apk"])
-    pid: float = OutputField(example_values=[843])
+    pid: int = OutputField(example_values=[843])
     processname: str = OutputField(example_values=["io.selendroid.testapp"])
-    tid: float = OutputField(example_values=[1073870640])
+    tid: int = OutputField(example_values=[1073870640])
     time: float = OutputField(example_values=[0.212098])
 
 
@@ -395,26 +395,26 @@ class FilesdeletedOutput(ActionOutput):
             "/data/app/com.test.app860056677872.rr-M42In0rnQNzdiDmPkpQy0A==/base.apk.x86_64.flock"
         ]
     )
-    pid: float = OutputField(cef_types=["pid"], example_values=[4248])
+    pid: int = OutputField(cef_types=["pid"], example_values=[4248])
     processname: str = OutputField(example_values=["com.test.app860056677872.rr"])
-    tid: float = OutputField(example_values=[4248])
+    tid: int = OutputField(example_values=[4248])
     time: float = OutputField(example_values=[121.2224400043488])
 
 
 class FilesopenOutput(ActionOutput):
     name: str = OutputField(example_values=["/proc/self/cmdline"])
-    pid: float = OutputField(cef_types=["pid"], example_values=[4248])
+    pid: int = OutputField(cef_types=["pid"], example_values=[4248])
     processname: str = OutputField(example_values=["com.test.app860056677872.rr"])
-    tid: float = OutputField(example_values=[4248])
+    tid: int = OutputField(example_values=[4248])
     time: float = OutputField(example_values=[121.2202398777008])
 
 
 class FilesreadOutput(ActionOutput):
     data: str
     name: str = OutputField(example_values=["/data/app/io.selendroid.testapp-1.apk"])
-    pid: float = OutputField(cef_types=["pid"], example_values=[4248])
+    pid: int = OutputField(cef_types=["pid"], example_values=[4248])
     processname: str = OutputField(example_values=["com.mobeasyapp.app860056677872.rr"])
-    tid: float = OutputField(example_values=[4248])
+    tid: int = OutputField(example_values=[4248])
     time: float = OutputField(example_values=[121.220575094223])
 
 
@@ -425,37 +425,37 @@ class FileswrittenOutput(ActionOutput):
             "/data/user/0/com.test.app860056677872.rr/files/audience_network.dex"
         ]
     )
-    pid: float = OutputField(cef_types=["pid"], example_values=[4248])
+    pid: int = OutputField(cef_types=["pid"], example_values=[4248])
     processname: str = OutputField(example_values=["com.test.app860056677872.rr"])
-    tid: float = OutputField(example_values=[5159])
+    tid: int = OutputField(example_values=[5159])
     time: float = OutputField(example_values=[121.2951688766479])
 
 
 class LibrariesOutput(ActionOutput):
     name: str = OutputField(example_values=["monochrome_base"])
-    pid: float = OutputField(example_values=[5133])
+    pid: int = OutputField(example_values=[5133])
     processname: str = OutputField(example_values=["eu.toralarm.toralarm_wm"])
-    tid: float = OutputField(example_values=[5133])
+    tid: int = OutputField(example_values=[5133])
     time: float = OutputField(example_values=[122.8014578819275])
 
 
 class RecvnetOutput(ActionOutput):
     data: str = OutputField(example_values=["1603030058"])
-    pid: float = OutputField(example_values=[5133])
+    pid: int = OutputField(example_values=[5133])
     processname: str = OutputField(example_values=["eu.toralarm.toralarm_wm"])
     srchost: str = OutputField(example_values=["54.36.175.146"])
-    srcport: float = OutputField(example_values=[443])
-    tid: float = OutputField(example_values=[6224])
+    srcport: int = OutputField(example_values=[443])
+    tid: int = OutputField(example_values=[6224])
     time: float = OutputField(example_values=[124.5965847969055])
 
 
 class SendnetOutput(ActionOutput):
     data: str
     desthost: str = OutputField(example_values=["185.86.138.16"])
-    destport: float = OutputField(example_values=[80])
-    pid: float = OutputField(example_values=[5133])
+    destport: int = OutputField(example_values=[80])
+    pid: int = OutputField(example_values=[5133])
     processname: str = OutputField(example_values=["eu.toralarm.toralarm_wm"])
-    tid: float = OutputField(example_values=[6239])
+    tid: int = OutputField(example_values=[6239])
     time: float = OutputField(example_values=[125.5912230014801])
 
 
@@ -492,11 +492,11 @@ class AnalysisOutput(PermissiveActionOutput):
 class OverviewOutput(PermissiveActionOutput):
     analyzed: bool | None = None
     app: str | None = OutputField(example_values=["Test app"])
-    comments_count: float = OutputField(example_values=[0])
+    comments_count: int = OutputField(example_values=[0])
     company: str = OutputField(example_values=["Test Software ASA"])
     corrupted: bool | None = None
     created_at: str = OutputField(example_values=["2022-06-13T10:32:12.772734+02:00"])
-    created_on: float = OutputField(example_values=[1515099685])
+    created_on: int = OutputField(example_values=[1515099685])
     detected: bool | None = None
     displayed_version: str = OutputField(example_values=["32.0.2254.123747"])
     id: str = OutputField(example_values=["Lv8ydaXWQ4WOEQ3q"])
@@ -516,13 +516,13 @@ class OverviewOutput(PermissiveActionOutput):
     last_yara_analysis_at: str | None = OutputField(
         example_values=["2022-06-13T10:52:46.967913+02:00"]
     )
-    matches_count: float = OutputField(example_values=[1])
+    matches_count: int = OutputField(example_values=[1])
     md5: str = OutputField(
         cef_types=["md5"], example_values=["9b57f1954c84f386554b741ftesttest"]
     )
     on_devices: bool | None = None
     package_name: str | None = OutputField(example_values=["com.test.mini.native"])
-    rating: float = OutputField(example_values=[0])
+    rating: int = OutputField(example_values=[0])
     repo: str | None = None
     sha1: str = OutputField(
         cef_types=["sha1"], example_values=["testtestd5bac77e93e41493bd69b427testtest"]
@@ -533,7 +533,7 @@ class OverviewOutput(PermissiveActionOutput):
             "testtest1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest"
         ],
     )
-    size: float = OutputField(example_values=[7544622])
+    size: int = OutputField(example_values=[7544622])
     stored: bool | None = None
     tags: list[str] | None = OutputField(example_values=["bad-signed"])
     trusted: bool | None = None
@@ -545,7 +545,7 @@ class OverviewOutput(PermissiveActionOutput):
         ],
     )
     version: str = OutputField(example_values=["2"])
-    votes_count: float = OutputField(example_values=[0])
+    votes_count: int = OutputField(example_values=[0])
 
 
 class GetReportOutput(ActionOutput):

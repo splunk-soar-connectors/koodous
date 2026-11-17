@@ -43,7 +43,12 @@ def request(
     auth = (
         None if is_absolute_url else StaticTokenAuth(asset.api_key, token_type="Token")  # noqa: S106
     )
-    with httpx.Client(verify=asset.verify_server_cert, timeout=30, auth=auth) as client:
+    with httpx.Client(
+        verify=asset.verify_server_cert,
+        timeout=30,
+        auth=auth,
+        follow_redirects=True,
+    ) as client:
         response = client.request(
             method,
             url,

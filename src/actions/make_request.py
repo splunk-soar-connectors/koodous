@@ -58,7 +58,7 @@ def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
         raise ValueError("endpoint must remain within the Koodous API")
     query_parameters = parse_qsl(parsed_endpoint.query, keep_blank_values=True)
     extra_query_parameters = params.query_parameters or ""
-    if extra_query_parameters.lstrip().startswith("{"):
+    if extra_query_parameters.lstrip().startswith(("{", "[")):
         try:
             extra_query = json.loads(extra_query_parameters)
         except json.JSONDecodeError as error:
