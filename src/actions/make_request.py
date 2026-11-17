@@ -16,37 +16,36 @@
 import json
 from urllib.parse import parse_qsl, urlsplit, urlunsplit
 
-from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
-from soar_sdk.params import Param, Params
+from soar_sdk.action_results import (
+    MakeRequestOutput as SDKMakeRequestOutput,
+    OutputField,
+)
+from soar_sdk.params import MakeRequestParams as SDKMakeRequestParams, Param
 
 from ..app import Asset, app
 from ..helper import request
 
 
-class MakeRequestParams(Params):
+class MakeRequestParams(SDKMakeRequestParams):
+    http_method: str = Param(
+        description="HTTP method used for the request",
+        required=False,
+        default="GET",
+        value_list=["GET"],
+    )
     endpoint: str = Param(
         description="Relative Koodous API path, for example /apks",
         required=True,
         primary=True,
     )
-    query_parameters: str | None = Param(
-        description="Optional query parameters as a JSON object or query string"
-    )
 
 
-class MakeRequestOutput(ActionOutput):
-    response: str = OutputField()
+class MakeRequestOutput(SDKMakeRequestOutput):
+    response_body: str = OutputField(alias="response")
 
 
-@app.action(
-    description="Make a read-only GET request to the Koodous API",
-    action_type="investigate",
-    read_only=True,
-)
-def make_request(
-    params: MakeRequestParams, soar: SOARClient, asset: Asset
-) -> MakeRequestOutput:
+@app.make_request()
+def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
     """Query a relative Koodous API path and return the response as JSON."""
     endpoint = params.endpoint.strip()
     parsed_endpoint = urlsplit(endpoint)
@@ -75,6 +74,14 @@ def make_request(
         )
     # Put both sources in `params` so repeated keys survive HTTPX's URL parameter merge.
     request_endpoint = urlunsplit(("", "", path, "", ""))
-    result = request(asset, "GET", request_endpoint, params=query_parameters)
-    soar.set_message("Koodous API request completed")
-    return MakeRequestOutput(response=json.dumps(result, ensure_ascii=False))
+    response = request(
+        asset,
+        params.http_method,
+        request_endpoint,
+        params=query_parameters,
+        return_response=True,
+    )
+    return MakeRequestOutput(
+        status_code=response.status_code,
+        response_body=response.text,
+    )

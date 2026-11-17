@@ -14,6 +14,7 @@
 from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
 from soar_sdk.asset import BaseAsset, AssetField
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 logger = getLogger()
@@ -46,8 +47,11 @@ app = App(
 
 @app.test_connectivity()
 def test_connectivity(soar: SOARClient, asset: Asset) -> None:
-    """Verify the Koodous API key."""
-    request(asset, "GET", "/apks", params={"search": "Whatsapp"})
+    """Verify connectivity by searching Koodous APKs."""
+    try:
+        request(asset, "GET", "/apks", params={"search": "Whatsapp"})
+    except Exception as exc:
+        raise ActionFailure(str(exc)) from exc
     soar.set_message("Test connectivity passed")
 
 

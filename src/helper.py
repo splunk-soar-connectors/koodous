@@ -23,7 +23,14 @@ from soar_sdk.auth import StaticTokenAuth
 BASE_URL = "https://developer.koodous.com"
 
 
-def request(asset: Any, method: str, endpoint: str, **kwargs: Any) -> Any:
+def request(
+    asset: Any,
+    method: str,
+    endpoint: str,
+    *,
+    return_response: bool = False,
+    **kwargs: Any,
+) -> Any:
     """Send an API request, authenticating only requests to Koodous."""
     parsed_endpoint = urlsplit(endpoint)
     is_absolute_url = bool(parsed_endpoint.scheme or parsed_endpoint.netloc)
@@ -43,7 +50,7 @@ def request(asset: Any, method: str, endpoint: str, **kwargs: Any) -> Any:
             **kwargs,
         )
     if response.status_code == 405:
-        return {}
+        return response if return_response else {}
     if response.status_code == 409:
         raise ValueError("This file has already been uploaded")
     if response.status_code == 415:
@@ -52,6 +59,8 @@ def request(asset: Any, method: str, endpoint: str, **kwargs: Any) -> Any:
         raise ValueError(
             f"Koodous API returned HTTP {response.status_code}: {response.text}"
         )
+    if return_response:
+        return response
     return response.json() if response.content else {}
 
 

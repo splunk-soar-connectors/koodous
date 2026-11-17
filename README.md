@@ -38,7 +38,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [test connectivity](#action-test-connectivity) - Verify the Koodous API key. <br>
 [detonate file](#action-detonate-file) - Run the file in the sandbox and retrieve the analysis results <br>
 [get report](#action-get-report) - Query for results of an already completed detonation <br>
-[make request](#action-make-request) - Make a read-only GET request to the Koodous API
+[make request](#action-make-request) - Query a relative Koodous API path and return the response as JSON.
 
 ## action: 'test connectivity'
 
@@ -634,17 +634,24 @@ summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'make request'
 
-Make a read-only GET request to the Koodous API
+Query a relative Koodous API path and return the response as JSON.
 
-Type: **investigate** <br>
-Read only: **True**
+Type: **generic** <br>
+Read only: **False**
+
+'make request' action for the app. Used to handle arbitrary HTTP requests with the app's asset
 
 #### Action Parameters
 
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
+**http_method** | optional | HTTP method used for the request | string | |
 **endpoint** | required | Relative Koodous API path, for example /apks | string | |
-**query_parameters** | optional | Optional query parameters as a JSON object or query string | string | |
+**headers** | optional | The headers to send with the request (JSON object). An example is {'Content-Type': 'application/json'} | string | |
+**query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
+**body** | optional | The body to send with the request (JSON object). An example is {'key': 'value', 'key2': 'value2'} | string | |
+**timeout** | optional | The timeout for the request in seconds. | numeric | |
+**verify_ssl** | optional | Whether to verify the SSL certificate. Default is True. | boolean | |
 
 #### Action Output
 
@@ -652,8 +659,14 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failure |
 action_result.message | string | | |
+action_result.parameter.http_method | string | | |
 action_result.parameter.endpoint | string | | |
+action_result.parameter.headers | string | | |
 action_result.parameter.query_parameters | string | | |
+action_result.parameter.body | string | | |
+action_result.parameter.timeout | numeric | | |
+action_result.parameter.verify_ssl | boolean | | |
+action_result.data.\*.status_code | numeric | | 200 404 500 |
 action_result.data.\*.response | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
