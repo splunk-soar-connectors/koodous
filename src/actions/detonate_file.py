@@ -13,6 +13,8 @@
 # limitations under the License.
 """Detonate file action."""
 
+from typing import Any
+
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
@@ -21,8 +23,9 @@ from soar_sdk.action_results import (
     PermissiveActionOutput,
 )
 from soar_sdk.params import Param, Params
+
 from ..app import Asset, app
-from ..helper import report, request
+from ..helper import normalize_attempts, report, request, response_data
 
 
 class DetonateFileParams(Params):
@@ -36,12 +39,21 @@ class DetonateFileParams(Params):
         default="all",
         value_list=["static", "dynamic", "yara", "all"],
     )
-    attempts: int | None = Param(
-        description="Number of attempts to make while polling", default=10
+    attempts: int = Param(
+        description="Number of attempts to make while polling",
+        required=False,
+        default=10,
     )
     force_yara_analysis: bool | None = Param(
         description="Perform Yara analysis", default=False
     )
+
+    def __init__(self, **data: Any) -> None:
+        if "attempts" in data:
+            data["attempts"] = normalize_attempts(data["attempts"])
+        if data.get("force_yara_analysis") == "":
+            data["force_yara_analysis"] = False
+        super().__init__(**data)
 
 
 class ApiKeyOutput(ActionOutput):
@@ -551,7 +563,8 @@ class OverviewOutput(PermissiveActionOutput):
     votes_count: int = OutputField(example_values=[0])
 
 
-class DetonateFileOutput(ActionOutput):
+class DetonateFileOutput(PermissiveActionOutput):
+    # Preserve the raw report while declaring its nested SOAR datapaths.
     analysis: AnalysisOutput | None = None
     overview: OverviewOutput
 
@@ -571,7 +584,7 @@ class DetonateFileSummary(ActionOutput):
 def detonate_file(
     params: DetonateFileParams, soar: SOARClient, asset: Asset
 ) -> DetonateFileOutput:
-    attempts = max(1, int(params.attempts or 1))
+    attempts = max(1, params.attempts)
     analysis_type = params.analysis_type or "all"
     if analysis_type not in {"all", "static", "dynamic", "yara"}:
         raise ValueError(
@@ -587,9 +600,14 @@ def detonate_file(
         raise ValueError("Please provide a valid apk file")
     if not sha256:
         raise ValueError("Please specify a valid APK file")
-    try:
-        overview = request(asset, "GET", f"/apks/{sha256}")
-    except ValueError:
+    overview_response = request(
+        asset,
+        "GET",
+        f"/apks/{sha256}",
+        return_response=True,
+        retry_rate_limited=True,
+    )
+    if overview_response.status_code == 404:
         upload = request(asset, "GET", f"/apks/{sha256}/get_upload_url")
         with attachment.open("rb") as apk:
             request(
@@ -598,7 +616,9 @@ def detonate_file(
                 upload["upload_url"],
                 files={"file": (attachment.name, apk)},
             )
-        overview = request(asset, "GET", f"/apks/{sha256}")
+        overview = request(asset, "GET", f"/apks/{sha256}", retry_rate_limited=True)
+    else:
+        overview = response_data(overview_response)
     last_yara = overview.get("last_yara_analysis_at")
     requested = {
         "dynamic": analysis_type in {"dynamic", "all"}
@@ -616,23 +636,25 @@ def detonate_file(
                 f"/apks/{sha256}/{ {'dynamic': 'analyze_dynamic', 'static': 'analyze_static', 'yara': 'analyze_yara'}[kind] }/",
             )
     overview, analysis, analysis_complete = report(
-        asset, soar, sha256, attempts, analysis_type, last_yara
+        asset,
+        soar,
+        sha256,
+        attempts,
+        analysis_type,
+        last_yara_analysis_at=last_yara if requested["yara"] else None,
     )
+    result_data = {"overview": overview}
+    if analysis:
+        result_data["analysis"] = analysis
     summary = DetonateFileSummary(sha256=sha256, analysis_complete=analysis_complete)
-    output = DetonateFileOutput(
-        overview=overview, analysis=analysis if analysis else None
-    )
+
     if not analysis_complete:
         message = f"Polling attempts were exhausted before the {analysis_type} analysis completed"
         failed_result = ActionResult(False, message)
-        partial_data = {"overview": overview}
-        if analysis:
-            partial_data["analysis"] = analysis
-        failed_result.add_data(partial_data)
-        failed_result.set_summary(
-            {"sha256": sha256, "analysis_complete": analysis_complete}
-        )
+        failed_result.add_data(result_data)
+        failed_result.set_summary(summary.model_dump())
         return failed_result
+
     soar.set_summary(summary)
     soar.set_message("Successfully retrieved overview and analysis")
-    return output
+    return DetonateFileOutput(**result_data)

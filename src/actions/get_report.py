@@ -13,6 +13,8 @@
 # limitations under the License.
 """Get report action."""
 
+from typing import Any
+
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
@@ -21,8 +23,9 @@ from soar_sdk.action_results import (
     PermissiveActionOutput,
 )
 from soar_sdk.params import Param, Params
+
 from ..app import Asset, app
-from ..helper import report
+from ..helper import normalize_attempts, report
 
 
 class GetReportParams(Params):
@@ -36,9 +39,16 @@ class GetReportParams(Params):
         primary=True,
         cef_types=["vault id", "sha1"],
     )
-    attempts: int | None = Param(
-        description="Number of attempts to make while polling", default=1
+    attempts: int = Param(
+        description="Number of attempts to make while polling",
+        required=False,
+        default=1,
     )
+
+    def __init__(self, **data: Any) -> None:
+        if "attempts" in data:
+            data["attempts"] = normalize_attempts(data["attempts"])
+        super().__init__(**data)
 
 
 class ApiKeyOutput(ActionOutput):
@@ -548,7 +558,8 @@ class OverviewOutput(PermissiveActionOutput):
     votes_count: int = OutputField(example_values=[0])
 
 
-class GetReportOutput(ActionOutput):
+class GetReportOutput(PermissiveActionOutput):
+    # Preserve the raw report while declaring its nested SOAR datapaths.
     analysis: AnalysisOutput | None = None
     overview: OverviewOutput
 
@@ -568,7 +579,7 @@ class GetReportSummary(ActionOutput):
 def get_report(
     params: GetReportParams, soar: SOARClient, asset: Asset
 ) -> GetReportOutput:
-    attempts = max(1, int(params.attempts or 1))
+    attempts = max(1, params.attempts)
     sha256 = params.sha256
     if params.vault_id:
         attachments = soar.vault.get_attachment(vault_id=params.vault_id)
@@ -581,19 +592,18 @@ def get_report(
     if not sha256:
         raise ValueError("Please specify either sha256 or vault_id")
     overview, analysis, analysis_complete = report(asset, soar, sha256, attempts)
+    result_data = {"overview": overview}
+    if analysis:
+        result_data["analysis"] = analysis
     summary = GetReportSummary(sha256=sha256, analysis_complete=analysis_complete)
-    output = GetReportOutput(overview=overview, analysis=analysis if analysis else None)
+
     if not analysis_complete:
         message = "Polling attempts were exhausted before the analysis completed"
         failed_result = ActionResult(False, message)
-        partial_data = {"overview": overview}
-        if analysis:
-            partial_data["analysis"] = analysis
-        failed_result.add_data(partial_data)
-        failed_result.set_summary(
-            {"sha256": sha256, "analysis_complete": analysis_complete}
-        )
+        failed_result.add_data(result_data)
+        failed_result.set_summary(summary.model_dump())
         return failed_result
+
     soar.set_summary(summary)
     soar.set_message("Successfully retrieved overview and analysis")
-    return output
+    return GetReportOutput(**result_data)

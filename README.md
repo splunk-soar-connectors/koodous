@@ -35,14 +35,14 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Verify the Koodous API key. <br>
+[test connectivity](#action-test-connectivity) - Verify connectivity by searching Koodous APKs. <br>
 [detonate file](#action-detonate-file) - Run the file in the sandbox and retrieve the analysis results <br>
 [get report](#action-get-report) - Query for results of an already completed detonation <br>
-[make request](#action-make-request) - Query a relative Koodous API path and return the response as JSON.
+[make request](#action-make-request) - Send an authenticated request to a relative Koodous API path.
 
 ## action: 'test connectivity'
 
-Verify the Koodous API key.
+Verify connectivity by searching Koodous APKs.
 
 Type: **test** <br>
 Read only: **True**
@@ -634,7 +634,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'make request'
 
-Query a relative Koodous API path and return the response as JSON.
+Send an authenticated request to a relative Koodous API path.
 
 Type: **generic** <br>
 Read only: **False**
@@ -645,13 +645,13 @@ Read only: **False**
 
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**http_method** | optional | HTTP method used for the request | string | |
+**http_method** | optional | HTTP method. Choose from GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS. | string | |
 **endpoint** | required | Relative Koodous API path, for example /apks | string | |
-**headers** | optional | The headers to send with the request (JSON object). An example is {'Content-Type': 'application/json'} | string | |
+**headers** | optional | HTTP headers as a JSON object with string values, for example {"Accept": "application/json"}. Authorization uses the asset API key. | string | |
 **query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
-**body** | optional | The body to send with the request (JSON object). An example is {'key': 'value', 'key2': 'value2'} | string | |
-**timeout** | optional | The timeout for the request in seconds. | numeric | |
-**verify_ssl** | optional | Whether to verify the SSL certificate. Default is True. | boolean | |
+**body** | optional | Request body as a JSON object, for example {"key": "value"}. | string | |
+**timeout** | optional | Request timeout in seconds. Must be positive. Defaults to 30. | numeric | |
+**verify_ssl** | optional | Verify the server certificate. Uses the asset setting when omitted. | boolean | |
 
 #### Action Output
 
