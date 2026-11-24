@@ -1,3 +1,16 @@
+# Copyright (c) 2026 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Mocked API coverage for Koodous report output serialization."""
 
 from __future__ import annotations
@@ -34,7 +47,7 @@ def _api_payloads() -> tuple[dict, dict]:
         "status": "analyzed",
         "androguard": {
             "app_name": {"unexpected": "object instead of string"},
-            "api_key": "unexpected scalar instead of object",
+            "api_key": "unexpected scalar instead of object",  # pragma: allowlist secret
             "unmodeled_section": {"preserved": True},
         },
         "dynamic": {
@@ -123,7 +136,10 @@ def _mock_response(
 
 
 def _asset() -> SimpleNamespace:
-    return SimpleNamespace(api_key="mock-token", verify_server_cert=True)
+    return SimpleNamespace(
+        api_key="mock-token",  # pragma: allowlist secret
+        verify_server_cert=True,
+    )
 
 
 def _soar() -> SimpleNamespace:

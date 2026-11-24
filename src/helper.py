@@ -30,7 +30,7 @@ MAX_AUTOMATIC_RATE_LIMIT_WAIT_SECONDS = 240
 
 def normalize_attempts(attempts: Any) -> Any:
     """Truncate numeric floats and accept only integer strings as in the legacy app."""
-    if isinstance(attempts, (float, str)):
+    if isinstance(attempts, float | str):
         try:
             return int(attempts)
         except (OverflowError, ValueError) as error:

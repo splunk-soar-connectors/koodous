@@ -51,6 +51,7 @@ repos:
     rev: v1.89.0
     hooks:
       - id: semgrep
+        additional_dependencies: ["setuptools==81.0.0"]
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
@@ -70,10 +71,6 @@ repos:
         language: python
         additional_dependencies: ["local-hooks"]
         args: ['.']
-      - id: notice-file
-        language: python
-        additional_dependencies: ["local-hooks"]
-        args: ['.']
       - id: release-notes
         language: python
         additional_dependencies: ["local-hooks"]
@@ -85,3 +82,11 @@ repos:
         language: python
         additional_dependencies: ["local-hooks"]
         args: ['.']
+  - repo: local
+    hooks:
+      - id: notice-file
+        name: Generate SDK NOTICE
+        entry: uv run --no-sync soarapps manifests create-notice .
+        language: system
+        pass_filenames: false
+        always_run: true
