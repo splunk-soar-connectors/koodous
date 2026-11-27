@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 3.0.0 <br>
 Product Vendor: Koodous <br>
 Product Name: Koodous <br>
-Minimum Product Version: 5.2.0
+Minimum Product Version: 7.0.0
 
 This app integrates with Koodous to analyze APK files
 
@@ -35,16 +35,19 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[test connectivity](#action-test-connectivity) - Verify connectivity by searching Koodous APKs. <br>
 [detonate file](#action-detonate-file) - Run the file in the sandbox and retrieve the analysis results <br>
-[get report](#action-get-report) - Query for results of an already completed detonation
+[get report](#action-get-report) - Query for results of an already completed detonation <br>
+[make request](#action-make-request) - Send an authenticated request to a relative Koodous API path.
 
 ## action: 'test connectivity'
 
-Validate the asset configuration for connectivity using supplied configuration
+Verify connectivity by searching Koodous APKs.
 
 Type: **test** <br>
 Read only: **True**
+
+Basic test for app.
 
 #### Action Parameters
 
@@ -52,7 +55,12 @@ No parameters are required for this action
 
 #### Action Output
 
-No Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'detonate file'
 
@@ -76,11 +84,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.analysis_type | string | | all |
-action_result.parameter.attempts | numeric | | 10 |
-action_result.parameter.force_yara_analysis | boolean | | False True |
-action_result.parameter.vault_id | string | `vault id` `sha1` | x5ac7cfc8f90a146f85716c27d7527b6af17287x |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.vault_id | string | `vault id` `sha1` | |
+action_result.parameter.analysis_type | string | | |
+action_result.parameter.attempts | numeric | | |
+action_result.parameter.force_yara_analysis | boolean | | |
 action_result.data.\*.analysis.androguard.activities | string | | com.test.msdk.shell.MVActivity |
 action_result.data.\*.analysis.androguard.androidtv | boolean | | True False |
 action_result.data.\*.analysis.androguard.api_key.com::startapp::sdk::APPLICATION_ID | string | | |
@@ -166,18 +175,21 @@ action_result.data.\*.analysis.androguard.urls | string | `url` | https://www.te
 action_result.data.\*.analysis.androguard.version_code | string | | 321123747 |
 action_result.data.\*.analysis.androguard.wearable | boolean | | True False |
 action_result.data.\*.analysis.cuckoo.category | string | | file |
-action_result.data.\*.analysis.cuckoo.file.crc32 | string | | D7FC7959 |
-action_result.data.\*.analysis.cuckoo.file.md5 | string | `md5` | testfa2440d3da26b02ae03b9566test |
-action_result.data.\*.analysis.cuckoo.file.name | string | | |
-action_result.data.\*.analysis.cuckoo.file.path | string | | |
-action_result.data.\*.analysis.cuckoo.file.sha1 | string | `sha1` | test2e8a9fb24546bdd04006f62027c4ab5btest |
-action_result.data.\*.analysis.cuckoo.file.sha256 | string | `sha256` | test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test |
-action_result.data.\*.analysis.cuckoo.file.sha512 | string | | testbfb445d2fb7087732be295ee72267b4dcd76803ef38a90af62d9e8ae94c34a2302b2d1fc19bc0cbaf1926f26cf63f4dd7ecd2c949c419485d6f7708atest |
-action_result.data.\*.analysis.cuckoo.file.size | numeric | | 9326031 |
-action_result.data.\*.analysis.cuckoo.file.ssdeep | string | | 196608:kmu71DmUnRIeDuhTA9UZYpO65cQ0pRB5YOPYzG6roP8H9a:kmu71DlnRI80k2ZYpOWh0pH55PYhro0I |
-action_result.data.\*.analysis.cuckoo.file.type | string | | Zip archive data |
+action_result.data.\*.analysis.cuckoo.file.name | string | | application.apk |
+action_result.data.\*.analysis.cuckoo.file.path | string | | /vault/application.apk |
+action_result.data.\*.analysis.cuckoo.file.type | string | | APK |
+action_result.data.\*.analysis.cuckoo.file.crc32 | string | | 5BCCD162 |
+action_result.data.\*.analysis.cuckoo.file.md5 | string | `md5` | testf1954c84f386554b741f5737test |
+action_result.data.\*.analysis.cuckoo.file.sha1 | string | `sha1` | test294cd5bac77e93e41493bd69b42705e2test |
+action_result.data.\*.analysis.cuckoo.file.sha256 | string | `sha256` | testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest |
+action_result.data.\*.analysis.cuckoo.file.sha512 | string | | test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest |
+action_result.data.\*.analysis.cuckoo.file.size | numeric | | 7544622 |
+action_result.data.\*.analysis.cuckoo.file.ssdeep | string | | 196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj |
 action_result.data.\*.analysis.cuckoo.file_id | string | | |
 action_result.data.\*.analysis.cuckoo.target.category | string | | file |
+action_result.data.\*.analysis.cuckoo.target.file.name | string | | application.apk |
+action_result.data.\*.analysis.cuckoo.target.file.path | string | | /vault/application.apk |
+action_result.data.\*.analysis.cuckoo.target.file.type | string | | APK |
 action_result.data.\*.analysis.cuckoo.target.file.crc32 | string | | 5BCCD162 |
 action_result.data.\*.analysis.cuckoo.target.file.md5 | string | `md5` | testf1954c84f386554b741f5737test |
 action_result.data.\*.analysis.cuckoo.target.file.sha1 | string | `sha1` | test294cd5bac77e93e41493bd69b42705e2test |
@@ -185,7 +197,60 @@ action_result.data.\*.analysis.cuckoo.target.file.sha256 | string | `sha256` | t
 action_result.data.\*.analysis.cuckoo.target.file.sha512 | string | | test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest |
 action_result.data.\*.analysis.cuckoo.target.file.size | numeric | | 7544622 |
 action_result.data.\*.analysis.cuckoo.target.file.ssdeep | string | | 196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj |
-action_result.data.\*.analysis.droidbox | string | | |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.algorithm | string | | base64_decode |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.tid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.time | numeric | | 123.2289459705353 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.path | string | | /data/app/io.selendroid.testapp-1.apk |
+action_result.data.\*.analysis.dynamic.dexclass.\*.pid | numeric | | 843 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.processname | string | | io.selendroid.testapp |
+action_result.data.\*.analysis.dynamic.dexclass.\*.tid | numeric | | 1073870640 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.time | numeric | | 0.212098 |
+action_result.data.\*.analysis.dynamic.dns.\*.domain | string | | rules.addapptr.com |
+action_result.data.\*.analysis.dynamic.dns.\*.hostname | string | | rules.addapptr.com |
+action_result.data.\*.analysis.dynamic.dns.\*.ip | string | | 151.80.27.93 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.name | string | | /data/app/com.test.app860056677872.rr-M42In0rnQNzdiDmPkpQy0A==/base.apk.x86_64.flock |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.time | numeric | | 121.2224400043488 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.name | string | | /proc/self/cmdline |
+action_result.data.\*.analysis.dynamic.filesopen.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesopen.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.time | numeric | | 121.2202398777008 |
+action_result.data.\*.analysis.dynamic.filesread.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.filesread.\*.name | string | | /data/app/io.selendroid.testapp-1.apk |
+action_result.data.\*.analysis.dynamic.filesread.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesread.\*.processname | string | | com.mobeasyapp.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesread.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesread.\*.time | numeric | | 121.220575094223 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.name | string | | /data/user/0/com.test.app860056677872.rr/files/audience_network.dex |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.tid | numeric | | 5159 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.time | numeric | | 121.2951688766479 |
+action_result.data.\*.analysis.dynamic.libraries.\*.name | string | | monochrome_base |
+action_result.data.\*.analysis.dynamic.libraries.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.libraries.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.libraries.\*.tid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.libraries.\*.time | numeric | | 122.8014578819275 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.data | string | | 1603030058 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.recvnet.\*.srchost | string | | 54.36.175.146 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.srcport | numeric | | 443 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.tid | numeric | | 6224 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.time | numeric | | 124.5965847969055 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.sendnet.\*.desthost | string | | 185.86.138.16 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.destport | numeric | | 80 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.sendnet.\*.tid | numeric | | 6239 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.time | numeric | | 125.5912230014801 |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.algorithm | string | | base64_decode |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.data | string | | |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.processname | string | | eu.toralarm.toralarm_wm |
@@ -255,12 +320,12 @@ action_result.data.\*.overview.displayed_version | string | | 32.0.2254.123747 |
 action_result.data.\*.overview.id | string | | Lv8ydaXWQ4WOEQ3q |
 action_result.data.\*.overview.image | string | `url` | https://test.abc.com/media/apk_images/2022/06/13/logo_o8aYRh9.png |
 action_result.data.\*.overview.is_apk | boolean | | True False |
-action_result.data.\*.overview.is_corrupted | boolean | | False True |
-action_result.data.\*.overview.is_detected | boolean | | False True |
+action_result.data.\*.overview.is_corrupted | boolean | | True False |
+action_result.data.\*.overview.is_detected | boolean | | True False |
 action_result.data.\*.overview.is_dynamic_analyzed | boolean | | True False |
-action_result.data.\*.overview.is_installed | boolean | | False True |
+action_result.data.\*.overview.is_installed | boolean | | True False |
 action_result.data.\*.overview.is_static_analyzed | boolean | | True False |
-action_result.data.\*.overview.is_trusted | boolean | | False True |
+action_result.data.\*.overview.is_trusted | boolean | | True False |
 action_result.data.\*.overview.last_yara_analysis_at | string | | 2022-06-13T10:52:46.967913+02:00 |
 action_result.data.\*.overview.matches_count | numeric | | 1 |
 action_result.data.\*.overview.md5 | string | `md5` | 9b57f1954c84f386554b741ftesttest |
@@ -272,15 +337,14 @@ action_result.data.\*.overview.sha1 | string | `sha1` | testtestd5bac77e93e41493
 action_result.data.\*.overview.sha256 | string | `sha256` | testtest1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest |
 action_result.data.\*.overview.size | numeric | | 7544622 |
 action_result.data.\*.overview.stored | boolean | | True False |
-action_result.data.\*.overview.tags | string | | bad-signed |
+action_result.data.\*.overview.tags.\* | string | | bad-signed |
 action_result.data.\*.overview.trusted | boolean | | True False |
 action_result.data.\*.overview.updated_at | string | | 2022-06-13T10:32:12.772757+02:00 |
 action_result.data.\*.overview.url | string | `url` | https://test.abc.com/apks/test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test/ |
 action_result.data.\*.overview.version | string | | 2 |
 action_result.data.\*.overview.votes_count | numeric | | 0 |
+action_result.summary.sha256 | string | `sha256` | |
 action_result.summary.analysis_complete | boolean | | True False |
-action_result.summary.sha256 | string | `sha256` | testtestc1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest |
-action_result.message | string | | Successfully retrieved overview and analysis |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -305,10 +369,11 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.attempts | numeric | | 10 |
-action_result.parameter.sha256 | string | `sha256` | testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.sha256 | string | `sha256` | |
 action_result.parameter.vault_id | string | `vault id` `sha1` | |
+action_result.parameter.attempts | numeric | | |
 action_result.data.\*.analysis.androguard.activities | string | | com.test.msdk.shell.MVActivity |
 action_result.data.\*.analysis.androguard.androidtv | boolean | | True False |
 action_result.data.\*.analysis.androguard.api_key.com::startapp::sdk::APPLICATION_ID | string | | |
@@ -394,18 +459,21 @@ action_result.data.\*.analysis.androguard.urls | string | `url` | https://www.te
 action_result.data.\*.analysis.androguard.version_code | string | | 321123747 |
 action_result.data.\*.analysis.androguard.wearable | boolean | | True False |
 action_result.data.\*.analysis.cuckoo.category | string | | file |
-action_result.data.\*.analysis.cuckoo.file.crc32 | string | | D7FC7959 |
-action_result.data.\*.analysis.cuckoo.file.md5 | string | `md5` | testfa2440d3da26b02ae03b9566test |
-action_result.data.\*.analysis.cuckoo.file.name | string | | |
-action_result.data.\*.analysis.cuckoo.file.path | string | | |
-action_result.data.\*.analysis.cuckoo.file.sha1 | string | `sha1` | test2e8a9fb24546bdd04006f62027c4ab5btest |
-action_result.data.\*.analysis.cuckoo.file.sha256 | string | `sha256` | test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test |
-action_result.data.\*.analysis.cuckoo.file.sha512 | string | | testbfb445d2fb7087732be295ee72267b4dcd76803ef38a90af62d9e8ae94c34a2302b2d1fc19bc0cbaf1926f26cf63f4dd7ecd2c949c419485d6f7708atest |
-action_result.data.\*.analysis.cuckoo.file.size | numeric | | 9326031 |
-action_result.data.\*.analysis.cuckoo.file.ssdeep | string | | 196608:kmu71DmUnRIeDuhTA9UZYpO65cQ0pRB5YOPYzG6roP8H9a:kmu71DlnRI80k2ZYpOWh0pH55PYhro0I |
-action_result.data.\*.analysis.cuckoo.file.type | string | | Zip archive data |
+action_result.data.\*.analysis.cuckoo.file.name | string | | application.apk |
+action_result.data.\*.analysis.cuckoo.file.path | string | | /vault/application.apk |
+action_result.data.\*.analysis.cuckoo.file.type | string | | APK |
+action_result.data.\*.analysis.cuckoo.file.crc32 | string | | 5BCCD162 |
+action_result.data.\*.analysis.cuckoo.file.md5 | string | `md5` | testf1954c84f386554b741f5737test |
+action_result.data.\*.analysis.cuckoo.file.sha1 | string | `sha1` | test294cd5bac77e93e41493bd69b42705e2test |
+action_result.data.\*.analysis.cuckoo.file.sha256 | string | `sha256` | testa95ec1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc28478aftest |
+action_result.data.\*.analysis.cuckoo.file.sha512 | string | | test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest |
+action_result.data.\*.analysis.cuckoo.file.size | numeric | | 7544622 |
+action_result.data.\*.analysis.cuckoo.file.ssdeep | string | | 196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj |
 action_result.data.\*.analysis.cuckoo.file_id | string | | |
 action_result.data.\*.analysis.cuckoo.target.category | string | | file |
+action_result.data.\*.analysis.cuckoo.target.file.name | string | | application.apk |
+action_result.data.\*.analysis.cuckoo.target.file.path | string | | /vault/application.apk |
+action_result.data.\*.analysis.cuckoo.target.file.type | string | | APK |
 action_result.data.\*.analysis.cuckoo.target.file.crc32 | string | | 5BCCD162 |
 action_result.data.\*.analysis.cuckoo.target.file.md5 | string | `md5` | testf1954c84f386554b741f5737test |
 action_result.data.\*.analysis.cuckoo.target.file.sha1 | string | `sha1` | test294cd5bac77e93e41493bd69b42705e2test |
@@ -413,7 +481,60 @@ action_result.data.\*.analysis.cuckoo.target.file.sha256 | string | `sha256` | t
 action_result.data.\*.analysis.cuckoo.target.file.sha512 | string | | test989f8d8a4726bbc8ef61bbc73a855461d4897c2c43cdacd847f3901069d8ac230e6c80da67525e0ed94e3f8449f56520a7a6e143f8314ca08671308ctest |
 action_result.data.\*.analysis.cuckoo.target.file.size | numeric | | 7544622 |
 action_result.data.\*.analysis.cuckoo.target.file.ssdeep | string | | 196608:XX3GmbVoah5KRFtOHuPtEpT2q0XlfoJ82lCIOYb7hoI:2mbrh5M0HuPST2RVfQ8NIOGj |
-action_result.data.\*.analysis.droidbox | string | | |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.algorithm | string | | base64_decode |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.tid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.cryptousage.\*.time | numeric | | 123.2289459705353 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.path | string | | /data/app/io.selendroid.testapp-1.apk |
+action_result.data.\*.analysis.dynamic.dexclass.\*.pid | numeric | | 843 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.processname | string | | io.selendroid.testapp |
+action_result.data.\*.analysis.dynamic.dexclass.\*.tid | numeric | | 1073870640 |
+action_result.data.\*.analysis.dynamic.dexclass.\*.time | numeric | | 0.212098 |
+action_result.data.\*.analysis.dynamic.dns.\*.domain | string | | rules.addapptr.com |
+action_result.data.\*.analysis.dynamic.dns.\*.hostname | string | | rules.addapptr.com |
+action_result.data.\*.analysis.dynamic.dns.\*.ip | string | | 151.80.27.93 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.name | string | | /data/app/com.test.app860056677872.rr-M42In0rnQNzdiDmPkpQy0A==/base.apk.x86_64.flock |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesdeleted.\*.time | numeric | | 121.2224400043488 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.name | string | | /proc/self/cmdline |
+action_result.data.\*.analysis.dynamic.filesopen.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesopen.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesopen.\*.time | numeric | | 121.2202398777008 |
+action_result.data.\*.analysis.dynamic.filesread.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.filesread.\*.name | string | | /data/app/io.selendroid.testapp-1.apk |
+action_result.data.\*.analysis.dynamic.filesread.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.filesread.\*.processname | string | | com.mobeasyapp.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.filesread.\*.tid | numeric | | 4248 |
+action_result.data.\*.analysis.dynamic.filesread.\*.time | numeric | | 121.220575094223 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.name | string | | /data/user/0/com.test.app860056677872.rr/files/audience_network.dex |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.pid | numeric | `pid` | 4248 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.processname | string | | com.test.app860056677872.rr |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.tid | numeric | | 5159 |
+action_result.data.\*.analysis.dynamic.fileswritten.\*.time | numeric | | 121.2951688766479 |
+action_result.data.\*.analysis.dynamic.libraries.\*.name | string | | monochrome_base |
+action_result.data.\*.analysis.dynamic.libraries.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.libraries.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.libraries.\*.tid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.libraries.\*.time | numeric | | 122.8014578819275 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.data | string | | 1603030058 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.recvnet.\*.srchost | string | | 54.36.175.146 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.srcport | numeric | | 443 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.tid | numeric | | 6224 |
+action_result.data.\*.analysis.dynamic.recvnet.\*.time | numeric | | 124.5965847969055 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.data | string | | |
+action_result.data.\*.analysis.dynamic.sendnet.\*.desthost | string | | 185.86.138.16 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.destport | numeric | | 80 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.pid | numeric | | 5133 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.processname | string | | eu.toralarm.toralarm_wm |
+action_result.data.\*.analysis.dynamic.sendnet.\*.tid | numeric | | 6239 |
+action_result.data.\*.analysis.dynamic.sendnet.\*.time | numeric | | 125.5912230014801 |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.algorithm | string | | base64_decode |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.data | string | | |
 action_result.data.\*.analysis.droidbox.cryptousage.\*.processname | string | | eu.toralarm.toralarm_wm |
@@ -483,12 +604,12 @@ action_result.data.\*.overview.displayed_version | string | | 32.0.2254.123747 |
 action_result.data.\*.overview.id | string | | Lv8ydaXWQ4WOEQ3q |
 action_result.data.\*.overview.image | string | `url` | https://test.abc.com/media/apk_images/2022/06/13/logo_o8aYRh9.png |
 action_result.data.\*.overview.is_apk | boolean | | True False |
-action_result.data.\*.overview.is_corrupted | boolean | | False True |
-action_result.data.\*.overview.is_detected | boolean | | False True |
+action_result.data.\*.overview.is_corrupted | boolean | | True False |
+action_result.data.\*.overview.is_detected | boolean | | True False |
 action_result.data.\*.overview.is_dynamic_analyzed | boolean | | True False |
-action_result.data.\*.overview.is_installed | boolean | | False True |
+action_result.data.\*.overview.is_installed | boolean | | True False |
 action_result.data.\*.overview.is_static_analyzed | boolean | | True False |
-action_result.data.\*.overview.is_trusted | boolean | | False True |
+action_result.data.\*.overview.is_trusted | boolean | | True False |
 action_result.data.\*.overview.last_yara_analysis_at | string | | 2022-06-13T10:52:46.967913+02:00 |
 action_result.data.\*.overview.matches_count | numeric | | 1 |
 action_result.data.\*.overview.md5 | string | `md5` | 9b57f1954c84f386554b741ftesttest |
@@ -500,15 +621,53 @@ action_result.data.\*.overview.sha1 | string | `sha1` | testtestd5bac77e93e41493
 action_result.data.\*.overview.sha256 | string | `sha256` | testtest1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest |
 action_result.data.\*.overview.size | numeric | | 7544622 |
 action_result.data.\*.overview.stored | boolean | | True False |
-action_result.data.\*.overview.tags | string | | bad-signed |
+action_result.data.\*.overview.tags.\* | string | | bad-signed |
 action_result.data.\*.overview.trusted | boolean | | True False |
 action_result.data.\*.overview.updated_at | string | | 2022-06-13T10:32:12.772757+02:00 |
 action_result.data.\*.overview.url | string | `url` | https://test.abc.com/apks/test46ada7896b0c93a7a8741f3dbe3135e39b4b07100328b3a4c23b9bb3test/ |
 action_result.data.\*.overview.version | string | | 2 |
 action_result.data.\*.overview.votes_count | numeric | | 0 |
+action_result.summary.sha256 | string | `sha256` | |
 action_result.summary.analysis_complete | boolean | | True False |
-action_result.summary.sha256 | string | `sha256` | testtestc1d9ee65ad14654fd4c4095e3c71fe5b4064fe8b9f6dc284testtest |
-action_result.message | string | | Successfully retrieved overview and analysis |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'make request'
+
+Send an authenticated request to a relative Koodous API path.
+
+Type: **generic** <br>
+Read only: **False**
+
+'make request' action for the app. Used to handle arbitrary HTTP requests with the app's asset
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**http_method** | optional | HTTP method. Choose from GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS. | string | |
+**endpoint** | required | Relative Koodous API path, for example /apks | string | |
+**headers** | optional | HTTP headers as a JSON object with string values, for example {"Accept": "application/json"}. Authorization uses the asset API key. | string | |
+**query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
+**body** | optional | Request body as a JSON object, for example {"key": "value"}. | string | |
+**timeout** | optional | Request timeout in seconds. Must be positive. Defaults to 30. | numeric | |
+**verify_ssl** | optional | Verify the server certificate. Uses the asset setting when omitted. | boolean | |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.http_method | string | | |
+action_result.parameter.endpoint | string | | |
+action_result.parameter.headers | string | | |
+action_result.parameter.query_parameters | string | | |
+action_result.parameter.body | string | | |
+action_result.parameter.timeout | numeric | | |
+action_result.parameter.verify_ssl | boolean | | |
+action_result.data.\*.status_code | numeric | | 200 404 500 |
+action_result.data.\*.response | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
