@@ -14,20 +14,11 @@
 from httpx2 import RequestError
 from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
-from soar_sdk.asset import BaseAsset, AssetField
 from soar_sdk.exceptions import ActionFailure
-from soar_sdk.logging import getLogger
 
-logger = getLogger()
-
+from .actions import register_actions
+from .asset import Asset
 from .helper import request
-
-
-class Asset(BaseAsset):
-    api_key: str = AssetField(description="API Key", required=True, sensitive=True)
-    verify_server_cert: bool | None = AssetField(
-        description="Verify server certificate", default=True
-    )
 
 
 app = App(
@@ -71,8 +62,7 @@ def test_connectivity(soar: SOARClient, asset: Asset) -> None:
     soar.set_message("Test connectivity passed")
 
 
-# Import action modules for decorator registration.
-from .actions import detonate_file, get_report, make_request  # noqa: F401
+register_actions(app)
 
 if __name__ == "__main__":
     app.cli()

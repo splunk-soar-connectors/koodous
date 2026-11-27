@@ -27,7 +27,7 @@ from soar_sdk.action_results import (
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
-from ..app import Asset, app
+from ..asset import Asset
 from ..helper import fetch_analysis, normalize_attempts, poll_overview
 
 
@@ -572,13 +572,6 @@ class GetReportSummary(ActionOutput):
     analysis_complete: bool
 
 
-@app.action(
-    description="Query for results of an already completed detonation",
-    action_type="investigate",
-    read_only=True,
-    summary_type=GetReportSummary,
-    verbose="Either the <b>sha256</b> or <b>vault_id</b> should be specified. If both are specified, the <b>vault_id</b> parameter will be used. You do not need to be the one who detonated a file to retrieve a report. As long as you know the sha256 (or, have the file in the vault) of the APK you want to analyze, you could run this action. The <b>attempts</b> parameter is how many times this action will poll for analysis results. By default, this number is only 1. If you are polling after <b>detonate file</b> timed out, then you will want to increase this to a higher number. There will be a 30 second interval between each polling attempt.",
-)
 def get_report(
     params: GetReportParams, soar: SOARClient, asset: Asset
 ) -> GetReportOutput:

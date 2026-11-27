@@ -19,7 +19,8 @@ import httpx2
 import pytest
 from soar_sdk.exceptions import ActionFailure
 
-from src.app import Asset, test_connectivity as check_connectivity
+from src.app import test_connectivity as check_connectivity
+from src.asset import Asset
 
 
 @pytest.mark.parametrize(

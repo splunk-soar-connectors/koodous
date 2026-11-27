@@ -27,7 +27,7 @@ from soar_sdk.action_results import (
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
-from ..app import Asset, app
+from ..asset import Asset
 from ..helper import (
     fetch_analysis,
     normalize_attempts,
@@ -584,13 +584,6 @@ class DetonateFileSummary(ActionOutput):
     analysis_complete: bool
 
 
-@app.action(
-    description="Run the file in the sandbox and retrieve the analysis results",
-    action_type="generic",
-    read_only=False,
-    summary_type=DetonateFileSummary,
-    verbose="File detonation may take a while. If the polling in this action doesn't succeed in getting the file analysis (which will be indicated through the <b>analysis_complete</b> key in the summary), then you should continue polling with the <b>get report</b> action. If the <b>analysis_type</b> is 'yara' and <b>force_yara_analysis</b> is false, then the 'yara' analysis will only be performed if it has not been performed before. To perform yara analysis repeatedly, keep <b>force_yara_analysis</b> as true.",
-)
 def detonate_file(
     params: DetonateFileParams, soar: SOARClient, asset: Asset
 ) -> DetonateFileOutput:

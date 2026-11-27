@@ -25,7 +25,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.field_utils import parse_json_schema_extra
 from soar_sdk.params import MakeRequestParams as SDKMakeRequestParams, Param
 
-from ..app import Asset, app
+from ..asset import Asset
 from ..helper import request
 
 
@@ -81,7 +81,6 @@ def _parse_json_object(value: str | None, field_name: str) -> dict[str, Any] | N
     return parsed
 
 
-@app.make_request()
 def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
     """Send an authenticated request to a relative Koodous API path."""
     method = params.http_method.strip().upper()

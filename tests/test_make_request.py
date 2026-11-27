@@ -54,7 +54,7 @@ def test_make_request_accepts_sdk_methods(http_calls, method):
     params = MakeRequestParams(http_method=method, endpoint="/apks/")
     asset = SimpleNamespace(api_key="mock-key", verify_server_cert=True)
 
-    output = make_request.__wrapped__(params, asset)
+    output = make_request(params, asset)
 
     assert [request.method for request in requests] == [method]
     assert output.model_dump(by_alias=True) == {
@@ -76,7 +76,7 @@ def test_make_request_forwards_options_and_merges_query(http_calls):
         verify_ssl=False,
     )
 
-    make_request.__wrapped__(params, asset)
+    make_request(params, asset)
 
     [sent] = requests
     assert sent.method == "POST"
@@ -98,7 +98,7 @@ def test_make_request_expands_json_arrays_and_preserves_endpoint_query(http_call
         query_parameters='{"search":["input","another",""],"limit":10,"enabled":true,"blank":null,"page":[]}',
     )
 
-    make_request.__wrapped__(params, asset)
+    make_request(params, asset)
 
     [sent] = requests
     assert sent.url.params.get_list("search") == [
@@ -118,7 +118,7 @@ def test_make_request_defaults_to_get_and_asset_tls_setting(http_calls):
     requests, client_settings = http_calls
     asset = SimpleNamespace(api_key="mock-key", verify_server_cert=False)
 
-    make_request.__wrapped__(MakeRequestParams(endpoint="/apks/"), asset)
+    make_request(MakeRequestParams(endpoint="/apks/"), asset)
 
     assert [request.method for request in requests] == ["GET"]
     assert client_settings == [(False, 30)]
@@ -153,6 +153,6 @@ def test_make_request_rejects_invalid_options_without_sending(
     request_params = MakeRequestParams(**{"endpoint": "/apks/", **params})
 
     with pytest.raises(ActionFailure, match=message):
-        make_request.__wrapped__(request_params, asset)
+        make_request(request_params, asset)
 
     assert requests == []

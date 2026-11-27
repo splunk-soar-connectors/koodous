@@ -168,7 +168,7 @@ def _attachment(sha256: str) -> SimpleNamespace:
 
 
 def _run_action(action, params, soar, *, success=True) -> object:
-    output = action.__wrapped__(params, soar, _asset())
+    output = action(params, soar, _asset())
     if success:
         assert isinstance(output, PermissiveActionOutput)
     added_results = []
@@ -373,7 +373,7 @@ def test_detonate_file_fails_on_analysis_submission_405(monkeypatch, kind):
     with pytest.raises(
         ActionFailure, match=rf"{kind} analysis submission \(HTTP 405\)"
     ):
-        detonate_file.__wrapped__(params, soar, _asset())
+        detonate_file(params, soar, _asset())
 
     assert [call.args[1:] for call in request.call_args_list] == [
         ("GET", f"/apks/{SHA256}"),
@@ -442,7 +442,7 @@ def test_detonate_file_rejects_blank_analysis_type(monkeypatch, analysis_type, e
     calls = _install_case_api(monkeypatch, {}, {})
 
     with pytest.raises(error, match="analysis_type"):
-        detonate_file.__wrapped__(
+        detonate_file(
             DetonateFileParams(vault_id="mock-vault-id", analysis_type=analysis_type),
             _soar(),
             _asset(),
@@ -470,7 +470,7 @@ def test_vault_actions_reject_missing_sha256_before_koodous_request(
     soar.vault = SimpleNamespace(get_attachment=lambda **_: [attachment])
 
     with pytest.raises(ActionFailure, match="missing its SHA-256 hash"):
-        action.__wrapped__(params, soar, _asset())
+        action(params, soar, _asset())
 
     assert calls == []
 
@@ -718,7 +718,7 @@ def test_detonate_file_stops_on_upload_conflict(monkeypatch):
     params = DetonateFileParams(vault_id="mock-vault-id")
 
     with pytest.raises(ActionFailure, match="This file has already been uploaded"):
-        detonate_file.__wrapped__(params, soar, _asset())
+        detonate_file(params, soar, _asset())
 
     assert request.call_count == 3
 
