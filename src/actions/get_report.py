@@ -13,8 +13,10 @@
 # limitations under the License.
 """Get report action."""
 
+from json import JSONDecodeError
 from typing import Any
 
+from httpx2 import RequestError
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
@@ -22,10 +24,11 @@ from soar_sdk.action_results import (
     OutputField,
     PermissiveActionOutput,
 )
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app
-from ..helper import normalize_attempts, report
+from ..helper import fetch_analysis, normalize_attempts, poll_overview
 
 
 class GetReportParams(Params):
@@ -588,18 +591,36 @@ def get_report(
         attachment = attachments[0]
         if not attachment.name.endswith(".apk"):
             raise ValueError("Please provide a valid apk file")
-        sha256 = (attachment.metadata or {}).get("sha256") or attachment.hash
+        sha256 = (attachment.metadata or {}).get("sha256")
+        if not sha256:
+            raise ActionFailure("Vault attachment is missing its SHA-256 hash")
     if not sha256:
         raise ValueError("Please specify either sha256 or vault_id")
-    overview, analysis, analysis_complete = report(asset, soar, sha256, attempts)
+    overview, analysis_complete = poll_overview(asset, soar, sha256, attempts)
     result_data = {"overview": overview}
-    if analysis:
-        result_data["analysis"] = analysis
+    message = "Polling attempts were exhausted before the analysis completed"
+    if analysis_complete:
+        try:
+            analysis = fetch_analysis(asset, sha256)
+        except (
+            ActionFailure,
+            RequestError,
+            JSONDecodeError,
+            UnicodeDecodeError,
+        ) as exc:
+            analysis_complete = False
+            message = exc.message if isinstance(exc, ActionFailure) else str(exc)
+        else:
+            if analysis:
+                result_data["analysis"] = analysis
     summary = GetReportSummary(sha256=sha256, analysis_complete=analysis_complete)
 
     if not analysis_complete:
-        message = "Polling attempts were exhausted before the analysis completed"
-        failed_result = ActionResult(False, message)
+        failed_result = ActionResult(
+            False,
+            message,
+            param=params.model_dump(exclude_unset=True, exclude_none=True),
+        )
         failed_result.add_data(result_data)
         failed_result.set_summary(summary.model_dump())
         return failed_result

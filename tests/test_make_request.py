@@ -16,7 +16,7 @@
 import json
 from types import SimpleNamespace
 
-import httpx
+import httpx2
 import pytest
 from soar_sdk.exceptions import ActionFailure
 
@@ -31,10 +31,10 @@ def http_calls(monkeypatch):
 
     def respond(request):
         requests.append(request)
-        return httpx.Response(200, text="mock response")
+        return httpx2.Response(200, text="mock response")
 
-    real_client = httpx.Client
-    transport = httpx.MockTransport(respond)
+    real_client = httpx2.Client
+    transport = httpx2.MockTransport(respond)
 
     def mock_client(*, verify, timeout, **kwargs):
         client_settings.append((verify, timeout))
@@ -42,7 +42,7 @@ def http_calls(monkeypatch):
             transport=transport, verify=verify, timeout=timeout, **kwargs
         )
 
-    monkeypatch.setattr(helper.httpx, "Client", mock_client)
+    monkeypatch.setattr(helper.httpx2, "Client", mock_client)
     return requests, client_settings
 
 
@@ -90,6 +90,30 @@ def test_make_request_forwards_options_and_merges_query(http_calls):
     assert client_settings == [(False, 7)]
 
 
+def test_make_request_expands_json_arrays_and_preserves_endpoint_query(http_calls):
+    requests, _ = http_calls
+    asset = SimpleNamespace(api_key="mock-key", verify_server_cert=True)
+    params = MakeRequestParams(
+        endpoint="/apks/?search=endpoint&search=&page=2",
+        query_parameters='{"search":["input","another",""],"limit":10,"enabled":true,"blank":null,"page":[]}',
+    )
+
+    make_request.__wrapped__(params, asset)
+
+    [sent] = requests
+    assert sent.url.params.get_list("search") == [
+        "endpoint",
+        "",
+        "input",
+        "another",
+        "",
+    ]
+    assert sent.url.params.get_list("page") == ["2"]
+    assert sent.url.params["limit"] == "10"
+    assert sent.url.params["enabled"] == "true"
+    assert sent.url.params["blank"] == ""
+
+
 def test_make_request_defaults_to_get_and_asset_tls_setting(http_calls):
     requests, client_settings = http_calls
     asset = SimpleNamespace(api_key="mock-key", verify_server_cert=False)
@@ -104,6 +128,14 @@ def test_make_request_defaults_to_get_and_asset_tls_setting(http_calls):
     ("params", "message"),
     [
         ({"http_method": "TRACE"}, "http_method must be one of"),
+        ({"endpoint": "https://example.invalid/apks"}, "relative Koodous API path"),
+        ({"endpoint": "//[invalid"}, "relative Koodous API path"),
+        ({"endpoint": "apks"}, "must begin with a single"),
+        ({"endpoint": "/apks/../feed"}, "must remain within the Koodous API"),
+        ({"query_parameters": "{invalid"}, "must be a JSON object or query string"),
+        ({"query_parameters": "[]"}, "must be a JSON object"),
+        ({"query_parameters": '{"search":{"nested":true}}'}, "arrays of scalars"),
+        ({"query_parameters": '{"search":[["nested"]]}'}, "arrays of scalars"),
         ({"headers": "{"}, "headers must contain a valid JSON object"),
         ({"headers": "[]"}, "headers must be a JSON object"),
         ({"headers": '{"X-Request-ID": 1}'}, "headers must contain only string values"),
@@ -118,8 +150,9 @@ def test_make_request_rejects_invalid_options_without_sending(
 ):
     requests, _ = http_calls
     asset = SimpleNamespace(api_key="mock-key", verify_server_cert=True)
+    request_params = MakeRequestParams(**{"endpoint": "/apks/", **params})
 
     with pytest.raises(ActionFailure, match=message):
-        make_request.__wrapped__(MakeRequestParams(endpoint="/apks/", **params), asset)
+        make_request.__wrapped__(request_params, asset)
 
     assert requests == []

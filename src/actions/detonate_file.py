@@ -13,8 +13,10 @@
 # limitations under the License.
 """Detonate file action."""
 
+from json import JSONDecodeError
 from typing import Any
 
+from httpx2 import RequestError
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
@@ -22,10 +24,17 @@ from soar_sdk.action_results import (
     OutputField,
     PermissiveActionOutput,
 )
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app
-from ..helper import normalize_attempts, report, request, response_data
+from ..helper import (
+    fetch_analysis,
+    normalize_attempts,
+    poll_overview,
+    request,
+    response_data,
+)
 
 
 class DetonateFileParams(Params):
@@ -34,8 +43,9 @@ class DetonateFileParams(Params):
         primary=True,
         cef_types=["vault id", "sha1"],
     )
-    analysis_type: str | None = Param(
+    analysis_type: str = Param(
         description="Type of analysis",
+        required=False,
         default="all",
         value_list=["static", "dynamic", "yara", "all"],
     )
@@ -585,21 +595,20 @@ def detonate_file(
     params: DetonateFileParams, soar: SOARClient, asset: Asset
 ) -> DetonateFileOutput:
     attempts = max(1, params.attempts)
-    analysis_type = params.analysis_type or "all"
+    analysis_type = params.analysis_type
     if analysis_type not in {"all", "static", "dynamic", "yara"}:
-        raise ValueError(
+        raise ActionFailure(
             "Please provide a valid analysis_type: static, dynamic, yara, or all"
         )
     attachments = soar.vault.get_attachment(vault_id=params.vault_id)
     if not attachments:
         raise ValueError("Vault file could not be found with supplied Vault ID")
     attachment = attachments[0]
-    metadata = attachment.metadata or {}
-    sha256 = metadata.get("sha256") or attachment.hash
     if not attachment.name.endswith(".apk"):
         raise ValueError("Please provide a valid apk file")
+    sha256 = (attachment.metadata or {}).get("sha256")
     if not sha256:
-        raise ValueError("Please specify a valid APK file")
+        raise ActionFailure("Vault attachment is missing its SHA-256 hash")
     overview_response = request(
         asset,
         "GET",
@@ -607,54 +616,94 @@ def detonate_file(
         return_response=True,
         retry_rate_limited=True,
     )
-    if overview_response.status_code == 404:
-        upload = request(asset, "GET", f"/apks/{sha256}/get_upload_url")
-        with attachment.open("rb") as apk:
-            request(
+    progress = []
+    result_data = {}
+    fetching_analysis = False
+    try:
+        if overview_response.status_code == 404:
+            upload = request(asset, "GET", f"/apks/{sha256}/get_upload_url")
+            with attachment.open("rb") as apk:
+                upload_response = request(
+                    asset,
+                    "POST",
+                    upload["upload_url"],
+                    files={"file": (attachment.name, apk)},
+                    return_response=True,
+                )
+            response_data(upload_response)
+            if upload_response.is_success:
+                progress.append("APK upload accepted")
+            overview = request(asset, "GET", f"/apks/{sha256}", retry_rate_limited=True)
+        else:
+            overview = response_data(overview_response)
+        result_data["overview"] = overview
+        last_yara = overview.get("last_yara_analysis_at")
+        requested = {
+            "dynamic": analysis_type in {"dynamic", "all"}
+            and not overview.get("is_dynamic_analyzed"),
+            "static": analysis_type in {"static", "all"}
+            and not overview.get("is_static_analyzed"),
+            "yara": analysis_type in {"yara", "all"}
+            and (params.force_yara_analysis or not last_yara),
+        }
+        for kind, should_run in requested.items():
+            if not should_run:
+                continue
+            submission_response = request(
                 asset,
-                "POST",
-                upload["upload_url"],
-                files={"file": (attachment.name, apk)},
+                "GET",
+                f"/apks/{sha256}/analyze_{kind}/",
+                return_response=True,
             )
-        overview = request(asset, "GET", f"/apks/{sha256}", retry_rate_limited=True)
+            if submission_response.status_code == 405:
+                raise ActionFailure(
+                    f"Koodous rejected the {kind} analysis submission (HTTP 405)"
+                )
+            response_data(submission_response)
+            if submission_response.is_success:
+                progress.append(f"{kind} analysis submission accepted")
+        overview, analysis_complete = poll_overview(
+            asset,
+            soar,
+            sha256,
+            attempts,
+            analysis_type,
+            last_yara_analysis_at=last_yara if requested["yara"] else None,
+            on_overview=lambda value: result_data.update(overview=value),
+        )
+        result_data["overview"] = overview
+        fetching_analysis = analysis_complete and analysis_type != "yara"
+        if fetching_analysis:
+            analysis = fetch_analysis(asset, sha256)
+            if analysis:
+                result_data["analysis"] = analysis
+    except (ActionFailure, RequestError, JSONDecodeError, UnicodeDecodeError) as exc:
+        if not progress and not fetching_analysis:
+            raise
+        message = exc.message if isinstance(exc, ActionFailure) else str(exc)
+        if progress:
+            message = f"{message.rstrip('.')}. Detonation progress includes {', '.join(progress)}."
     else:
-        overview = response_data(overview_response)
-    last_yara = overview.get("last_yara_analysis_at")
-    requested = {
-        "dynamic": analysis_type in {"dynamic", "all"}
-        and not overview.get("is_dynamic_analyzed"),
-        "static": analysis_type in {"static", "all"}
-        and not overview.get("is_static_analyzed"),
-        "yara": analysis_type in {"yara", "all"}
-        and (params.force_yara_analysis or not last_yara),
-    }
-    for kind, should_run in requested.items():
-        if should_run:
-            request(
-                asset,
-                "POST",
-                f"/apks/{sha256}/{ {'dynamic': 'analyze_dynamic', 'static': 'analyze_static', 'yara': 'analyze_yara'}[kind] }/",
-            )
-    overview, analysis, analysis_complete = report(
-        asset,
-        soar,
-        sha256,
-        attempts,
-        analysis_type,
-        last_yara_analysis_at=last_yara if requested["yara"] else None,
+        if analysis_complete:
+            soar.set_summary(DetonateFileSummary(sha256=sha256, analysis_complete=True))
+            soar.set_message("Successfully retrieved overview and analysis")
+            return DetonateFileOutput(**result_data)
+
+        analysis_name = (
+            "analysis" if analysis_type == "all" else f"{analysis_type} analysis"
+        )
+        message = (
+            f"Polling attempts were exhausted before the {analysis_name} completed"
+        )
+
+    result = ActionResult(
+        status=False,
+        message=message,
+        param=params.model_dump(exclude_unset=True, exclude_none=True),
     )
-    result_data = {"overview": overview}
-    if analysis:
-        result_data["analysis"] = analysis
-    summary = DetonateFileSummary(sha256=sha256, analysis_complete=analysis_complete)
-
-    if not analysis_complete:
-        message = f"Polling attempts were exhausted before the {analysis_type} analysis completed"
-        failed_result = ActionResult(False, message)
-        failed_result.add_data(result_data)
-        failed_result.set_summary(summary.model_dump())
-        return failed_result
-
-    soar.set_summary(summary)
-    soar.set_message("Successfully retrieved overview and analysis")
-    return DetonateFileOutput(**result_data)
+    if result_data:
+        result.add_data(result_data)
+    result.set_summary(
+        DetonateFileSummary(sha256=sha256, analysis_complete=False).model_dump()
+    )
+    return result

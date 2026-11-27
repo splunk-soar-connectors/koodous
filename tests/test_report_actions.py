@@ -17,8 +17,9 @@ from __future__ import annotations
 
 import io
 from types import SimpleNamespace
+from unittest.mock import Mock
 
-import httpx
+import httpx2
 import pytest
 from soar_sdk.action_results import PermissiveActionOutput
 from soar_sdk.app import App
@@ -62,18 +63,18 @@ def _api_payloads() -> tuple[dict, dict]:
 
 
 def _install_mock_api(
-    monkeypatch, overview: dict, analysis: dict
+    monkeypatch, overview: dict, analysis: dict | httpx2.Response
 ) -> list[tuple[str, str]]:
     calls: list[tuple[str, str]] = []
-    transport = httpx.MockTransport(
+    transport = httpx2.MockTransport(
         lambda request: _mock_response(request, overview, analysis, calls)
     )
-    real_client = httpx.Client
+    real_client = httpx2.Client
 
     def client_with_mock_transport(**kwargs):
         return real_client(transport=transport, **kwargs)
 
-    monkeypatch.setattr(helper.httpx, "Client", client_with_mock_transport)
+    monkeypatch.setattr(helper.httpx2, "Client", client_with_mock_transport)
     return calls
 
 
@@ -84,55 +85,63 @@ def _install_case_api(
 ) -> list[tuple[str, str]]:
     calls: list[tuple[str, str]] = []
     response_indexes: dict[str, int] = {}
-    transport = httpx.MockTransport(
+    transport = httpx2.MockTransport(
         lambda request: _case_response(
             request, overview_responses, analyses, response_indexes, calls
         )
     )
-    real_client = httpx.Client
+    real_client = httpx2.Client
 
     def client_with_mock_transport(**kwargs):
         return real_client(transport=transport, **kwargs)
 
-    monkeypatch.setattr(helper.httpx, "Client", client_with_mock_transport)
+    monkeypatch.setattr(helper.httpx2, "Client", client_with_mock_transport)
     monkeypatch.setattr(helper.time, "sleep", lambda _seconds: None)
     return calls
 
 
 def _case_response(
-    request: httpx.Request,
+    request: httpx2.Request,
     overview_responses: dict[str, list[dict]],
     analyses: dict[str, dict],
     response_indexes: dict[str, int],
     calls: list[tuple[str, str]],
-) -> httpx.Response:
+) -> httpx2.Response:
     calls.append((request.method, request.url.path))
     path_parts = request.url.path.strip("/").split("/")
     match request.method, path_parts:
-        case "POST", ["apks", sha256, "analyze_yara"] if sha256 in overview_responses:
-            return httpx.Response(204)
+        case "GET", [
+            "apks",
+            sha256,
+            "analyze_dynamic" | "analyze_static" | "analyze_yara",
+        ] if sha256 in overview_responses:
+            return httpx2.Response(204)
         case "GET", ["apks", sha256, "analysis"] if sha256 in analyses:
-            return httpx.Response(200, json=analyses[sha256])
+            return httpx2.Response(200, json=analyses[sha256])
         case "GET", ["apks", sha256] if sha256 in overview_responses:
             responses = overview_responses[sha256]
             index = response_indexes.get(sha256, 0)
             response_indexes[sha256] = index + 1
-            return httpx.Response(200, json=responses[min(index, len(responses) - 1)])
-    return httpx.Response(404, json={"detail": "Unexpected mocked endpoint"})
+            return httpx2.Response(200, json=responses[min(index, len(responses) - 1)])
+    return httpx2.Response(404, json={"detail": "Unexpected mocked endpoint"})
 
 
 def _mock_response(
-    request: httpx.Request,
+    request: httpx2.Request,
     overview: dict,
-    analysis: dict,
+    analysis: dict | httpx2.Response,
     calls: list[tuple[str, str]],
-) -> httpx.Response:
+) -> httpx2.Response:
     calls.append((request.method, request.url.path))
     if request.url.path == f"/apks/{SHA256}":
-        return httpx.Response(200, json=overview)
+        return httpx2.Response(200, json=overview)
     if request.url.path == f"/apks/{SHA256}/analysis":
-        return httpx.Response(200, json=analysis)
-    return httpx.Response(404, json={"detail": "Unexpected mocked endpoint"})
+        return (
+            analysis
+            if isinstance(analysis, httpx2.Response)
+            else httpx2.Response(200, json=analysis)
+        )
+    return httpx2.Response(404, json={"detail": "Unexpected mocked endpoint"})
 
 
 def _asset() -> SimpleNamespace:
@@ -191,6 +200,34 @@ def test_get_report_preserves_irregular_mocked_analysis(monkeypatch) -> None:
         ("GET", f"/apks/{SHA256}"),
         ("GET", f"/apks/{SHA256}/analysis"),
     ]
+
+
+@pytest.mark.parametrize("action", [get_report, detonate_file])
+@pytest.mark.parametrize("status_code", [404, 405, 429, 500])
+def test_report_actions_preserve_overview_when_analysis_fetch_fails(
+    monkeypatch, action, status_code
+):
+    overview, _ = _api_payloads()
+    calls = _install_mock_api(monkeypatch, overview, httpx2.Response(status_code))
+    soar = _soar()
+    lookup = ("GET", f"/apks/{SHA256}")
+    expected_calls = [lookup]
+    if action is detonate_file:
+        submitted_params = {"vault_id": "mock-vault-id", "attempts": 1}
+        params = DetonateFileParams(**submitted_params)
+        soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
+        expected_calls.append(lookup)
+    else:
+        submitted_params = {"sha256": SHA256, "attempts": 1}
+        params = GetReportParams(**submitted_params)
+
+    result = _run_action(action, params, soar, success=False)
+
+    assert result.get_data() == [{"overview": overview}]
+    assert result.get_summary() == {"sha256": SHA256, "analysis_complete": False}
+    assert result.get_param() == submitted_params
+    assert f"HTTP {status_code}" in result.get_message()
+    assert calls == [*expected_calls, ("GET", f"/apks/{SHA256}/analysis")]
 
 
 def test_detonate_file_preserves_irregular_mocked_analysis(monkeypatch) -> None:
@@ -288,7 +325,7 @@ def test_yara_detonation_returns_overview_when_ready(
     if starts_yara:
         assert calls == [
             lookup,
-            ("POST", f"/apks/{SHA256}/analyze_yara/"),
+            ("GET", f"/apks/{SHA256}/analyze_yara/"),
             lookup,
             lookup,
         ]
@@ -296,28 +333,187 @@ def test_yara_detonation_returns_overview_when_ready(
         assert calls == [lookup, lookup]
 
 
-@pytest.mark.parametrize("action", [get_report, detonate_file])
-def test_polling_timeout_preserves_partial_result(monkeypatch, action) -> None:
+@pytest.mark.parametrize("timestamp_fields", [{}, {"last_yara_analysis_at": None}])
+def test_forced_yara_waits_for_a_new_timestamp(monkeypatch, timestamp_fields):
+    overview, _ = _api_payloads()
+    incomplete = {
+        key: value for key, value in overview.items() if key != "last_yara_analysis_at"
+    }
+    incomplete.update(timestamp_fields)
+    complete = {**overview, "last_yara_analysis_at": "2026-11-19T10:00:00Z"}
+    calls = _install_case_api(
+        monkeypatch, {SHA256: [overview, incomplete, complete]}, {}
+    )
+    soar = _soar()
+    soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
+    params = DetonateFileParams(
+        vault_id="mock-vault-id",
+        analysis_type="yara",
+        force_yara_analysis=True,
+        attempts=2,
+    )
+
+    result = _run_action(detonate_file, params, soar)
+
+    assert result.get_data() == [{"overview": complete}]
+    lookup = ("GET", f"/apks/{SHA256}")
+    assert calls == [lookup, ("GET", f"/apks/{SHA256}/analyze_yara/"), lookup, lookup]
+
+
+@pytest.mark.parametrize("kind", ["dynamic", "static", "yara"])
+def test_detonate_file_fails_on_analysis_submission_405(monkeypatch, kind):
+    request = Mock(side_effect=[httpx2.Response(200, json={}), httpx2.Response(405)])
+    monkeypatch.setattr("src.actions.detonate_file.request", request)
+    soar = _soar()
+    soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
+    params = DetonateFileParams(
+        vault_id="mock-vault-id", analysis_type=kind, attempts=1
+    )
+
+    with pytest.raises(
+        ActionFailure, match=rf"{kind} analysis submission \(HTTP 405\)"
+    ):
+        detonate_file.__wrapped__(params, soar, _asset())
+
+    assert [call.args[1:] for call in request.call_args_list] == [
+        ("GET", f"/apks/{SHA256}"),
+        ("GET", f"/apks/{SHA256}/analyze_{kind}/"),
+    ]
+
+
+@pytest.mark.parametrize("failure_stage", ["submission", "report"])
+def test_detonate_file_preserves_progress_after_accepted_submission(
+    monkeypatch, failure_stage
+):
+    overview, _ = _api_payloads()
+    overview.update(is_dynamic_analyzed=False, is_static_analyzed=False)
+    latest = {**overview, "is_dynamic_analyzed": True}
+    calls = []
+    real_client = httpx2.Client
+
+    def respond(request):
+        path = request.url.path
+        calls.append((request.method, path))
+        if path == f"/apks/{SHA256}":
+            return httpx2.Response(200, json=overview if len(calls) == 1 else latest)
+        if path == f"/apks/{SHA256}/analyze_dynamic/":
+            return httpx2.Response(204)
+        if failure_stage == "submission":
+            assert path == f"/apks/{SHA256}/analyze_static/"
+            return httpx2.Response(405)
+        assert path == f"/apks/{SHA256}/analysis"
+        return httpx2.Response(500)
+
+    transport = httpx2.MockTransport(respond)
+    monkeypatch.setattr(
+        helper.httpx2,
+        "Client",
+        lambda **kwargs: real_client(transport=transport, **kwargs),
+    )
+    soar = _soar()
+    soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
+    params = DetonateFileParams(
+        vault_id="mock-vault-id",
+        analysis_type="all" if failure_stage == "submission" else "dynamic",
+    )
+
+    result = _run_action(detonate_file, params, soar, success=False)
+
+    assert result.get_summary() == {"sha256": SHA256, "analysis_complete": False}
+    assert result.get_param()["vault_id"] == "mock-vault-id"
+    assert "dynamic analysis submission accepted" in result.get_message()
+    lookup = ("GET", f"/apks/{SHA256}")
+    expected_calls = [lookup, ("GET", f"/apks/{SHA256}/analyze_dynamic/")]
+    if failure_stage == "submission":
+        assert result.get_data() == [{"overview": overview}]
+        assert "static analysis submission (HTTP 405)" in result.get_message()
+        expected_calls.append(("GET", f"/apks/{SHA256}/analyze_static/"))
+    else:
+        assert result.get_data() == [{"overview": latest}]
+        assert "HTTP 500" in result.get_message()
+        expected_calls.extend([lookup, ("GET", f"/apks/{SHA256}/analysis")])
+    assert calls == expected_calls
+
+
+@pytest.mark.parametrize(
+    ("analysis_type", "error"), [("", ActionFailure), (None, ValueError)]
+)
+def test_detonate_file_rejects_blank_analysis_type(monkeypatch, analysis_type, error):
+    calls = _install_case_api(monkeypatch, {}, {})
+
+    with pytest.raises(error, match="analysis_type"):
+        detonate_file.__wrapped__(
+            DetonateFileParams(vault_id="mock-vault-id", analysis_type=analysis_type),
+            _soar(),
+            _asset(),
+        )
+
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("action", "params"),
+    [
+        (detonate_file, DetonateFileParams(vault_id="mock-vault-id")),
+        (get_report, GetReportParams(vault_id="mock-vault-id", sha256=SHA256)),
+    ],
+)
+def test_vault_actions_reject_missing_sha256_before_koodous_request(
+    monkeypatch, action, params
+):
+    calls = _install_case_api(monkeypatch, {}, {})
+    vault_hash = "b" * 40
+    attachment = SimpleNamespace(
+        name="mock.apk", metadata={"sha1": vault_hash}, hash=vault_hash
+    )
+    soar = _soar()
+    soar.vault = SimpleNamespace(get_attachment=lambda **_: [attachment])
+
+    with pytest.raises(ActionFailure, match="missing its SHA-256 hash"):
+        action.__wrapped__(params, soar, _asset())
+
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("action", "submitted_params", "analysis_name"),
+    [
+        (get_report, {"sha256": SHA256, "attempts": 1}, "analysis"),
+        (get_report, {"vault_id": "mock-vault-id"}, "analysis"),
+        (detonate_file, {"vault_id": "mock-vault-id", "attempts": 1}, "analysis"),
+        (
+            detonate_file,
+            {
+                "vault_id": "mock-vault-id",
+                "attempts": 1,
+                "analysis_type": "yara",
+                "force_yara_analysis": True,
+            },
+            "yara analysis",
+        ),
+    ],
+)
+def test_polling_timeout_preserves_partial_result(
+    monkeypatch, action, submitted_params, analysis_name
+) -> None:
     overview, _ = _api_payloads()
     overview.update(is_static_analyzed=False, is_dynamic_analyzed=False)
     _install_case_api(monkeypatch, {SHA256: [overview]}, {})
     soar = _soar()
-    if action is detonate_file:
+    if "vault_id" in submitted_params:
         soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
-        params = DetonateFileParams(
-            vault_id="mock-vault-id",
-            attempts=1,
-            analysis_type="yara",
-            force_yara_analysis=True,
-        )
-    else:
-        params = GetReportParams(sha256=SHA256, attempts=1)
+    params_class = DetonateFileParams if action is detonate_file else GetReportParams
+    params = params_class.model_validate(submitted_params)
 
     result = _run_action(action, params, soar, success=False)
 
     assert result.get_data() == [{"overview": overview}]
     assert result.get_summary() == {"sha256": SHA256, "analysis_complete": False}
-    assert result.get_message().startswith("Polling attempts were exhausted")
+    assert (
+        result.get_message()
+        == f"Polling attempts were exhausted before the {analysis_name} completed"
+    )
+    assert result.get_param() == submitted_params
 
 
 @pytest.mark.parametrize(
@@ -358,34 +554,34 @@ def test_detonate_file_retries_rate_limit_without_upload(monkeypatch) -> None:
     progress_messages: list[str] = []
     overview_requests = 0
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         nonlocal overview_requests
         calls.append((request.method, request.url.path))
         if request.url.path == f"/apks/{SHA256}":
             overview_requests += 1
             if overview_requests == 1:
-                return httpx.Response(
+                return httpx2.Response(
                     429,
                     json={
                         "detail": "Request was throttled. Expected available in 44 seconds."
                     },
                 )
-            return httpx.Response(200, json=overview)
+            return httpx2.Response(200, json=overview)
         if request.url.path == f"/apks/{SHA256}/analysis":
-            return httpx.Response(200, json=analysis)
+            return httpx2.Response(200, json=analysis)
         if request.url.path == f"/apks/{SHA256}/get_upload_url":
-            return httpx.Response(
+            return httpx2.Response(
                 409, json={"detail": "This file has already been uploaded"}
             )
-        return httpx.Response(404, json={"detail": "Unexpected mocked endpoint"})
+        return httpx2.Response(404, json={"detail": "Unexpected mocked endpoint"})
 
-    real_client = httpx.Client
-    transport = httpx.MockTransport(respond)
+    real_client = httpx2.Client
+    transport = httpx2.MockTransport(respond)
 
     def client_with_mock_transport(**kwargs):
         return real_client(transport=transport, **kwargs)
 
-    monkeypatch.setattr(helper.httpx, "Client", client_with_mock_transport)
+    monkeypatch.setattr(helper.httpx2, "Client", client_with_mock_transport)
     monkeypatch.setattr(helper.time, "sleep", sleep_delays.append)
     monkeypatch.setattr(helper, "progress", progress_messages.append)
     soar = _soar()
@@ -422,24 +618,24 @@ def test_long_rate_limit_wait_sends_repeated_progress(monkeypatch) -> None:
 
 
 def test_24_hour_rate_limit_fails_without_waiting(monkeypatch) -> None:
-    calls: list[httpx.Request] = []
+    calls: list[httpx2.Request] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         calls.append(request)
-        return httpx.Response(
+        return httpx2.Response(
             429,
             headers={"Retry-After": "86400"},
             json={"detail": "Expected available in 86400 seconds"},
         )
 
-    real_client = httpx.Client
-    transport = httpx.MockTransport(respond)
+    real_client = httpx2.Client
+    transport = httpx2.MockTransport(respond)
 
     def client_with_mock_transport(**kwargs):
         return real_client(transport=transport, **kwargs)
 
     sleep_intervals: list[float] = []
-    monkeypatch.setattr(helper.httpx, "Client", client_with_mock_transport)
+    monkeypatch.setattr(helper.httpx2, "Client", client_with_mock_transport)
     monkeypatch.setattr(helper.time, "sleep", sleep_intervals.append)
 
     with pytest.raises(ActionFailure, match="HTTP 429"):
@@ -449,52 +645,82 @@ def test_24_hour_rate_limit_fails_without_waiting(monkeypatch) -> None:
     assert sleep_intervals == []
 
 
-def test_detonate_file_uploads_only_when_overview_is_not_found(monkeypatch) -> None:
+@pytest.mark.parametrize("refresh_status", [200, 500])
+def test_detonate_file_upload_and_refresh(monkeypatch, refresh_status):
     overview, analysis = _api_payloads()
     calls: list[tuple[str, str]] = []
     overview_requests = 0
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         nonlocal overview_requests
         calls.append((request.method, request.url.path))
         if request.url.path == f"/apks/{SHA256}":
             overview_requests += 1
             if overview_requests == 1:
-                return httpx.Response(404, json={"detail": "Not found"})
-            return httpx.Response(200, json=overview)
+                return httpx2.Response(404, json={"detail": "Not found"})
+            return httpx2.Response(refresh_status, json=overview)
         if request.url.path == f"/apks/{SHA256}/get_upload_url":
-            return httpx.Response(
+            return httpx2.Response(
                 200, json={"upload_url": "https://uploads.example/upload"}
             )
         if request.url.path == "/upload" and request.method == "POST":
-            return httpx.Response(200, json={"uploaded": True})
+            return httpx2.Response(204)
         if request.url.path == f"/apks/{SHA256}/analysis":
-            return httpx.Response(200, json=analysis)
-        return httpx.Response(404, json={"detail": "Unexpected mocked endpoint"})
+            return httpx2.Response(200, json=analysis)
+        return httpx2.Response(404, json={"detail": "Unexpected mocked endpoint"})
 
-    real_client = httpx.Client
-    transport = httpx.MockTransport(respond)
+    real_client = httpx2.Client
+    transport = httpx2.MockTransport(respond)
 
     def client_with_mock_transport(**kwargs):
         return real_client(transport=transport, **kwargs)
 
-    monkeypatch.setattr(helper.httpx, "Client", client_with_mock_transport)
+    monkeypatch.setattr(helper.httpx2, "Client", client_with_mock_transport)
     soar = _soar()
     soar.vault = SimpleNamespace(get_attachment=lambda **_kwargs: [_attachment(SHA256)])
 
     result = _run_action(
-        detonate_file, DetonateFileParams(vault_id="mock-vault-id", attempts=1), soar
+        detonate_file,
+        DetonateFileParams(vault_id="mock-vault-id", attempts=1),
+        soar,
+        success=refresh_status == 200,
     )
 
-    assert result.get_status() is True
-    assert calls == [
+    expected_calls = [
         ("GET", f"/apks/{SHA256}"),
         ("GET", f"/apks/{SHA256}/get_upload_url"),
         ("POST", "/upload"),
         ("GET", f"/apks/{SHA256}"),
-        ("GET", f"/apks/{SHA256}"),
-        ("GET", f"/apks/{SHA256}/analysis"),
     ]
+    if refresh_status == 200:
+        expected_calls.extend(
+            [("GET", f"/apks/{SHA256}"), ("GET", f"/apks/{SHA256}/analysis")]
+        )
+    else:
+        assert result.get_data() == []
+        assert result.get_summary() == {"sha256": SHA256, "analysis_complete": False}
+        assert f"HTTP {refresh_status}" in result.get_message()
+        assert "APK upload accepted" in result.get_message()
+    assert calls == expected_calls
+
+
+def test_detonate_file_stops_on_upload_conflict(monkeypatch):
+    request = Mock(
+        side_effect=[
+            httpx2.Response(404),
+            {"upload_url": "https://uploads.example/upload"},
+            httpx2.Response(409),
+        ]
+    )
+    monkeypatch.setattr("src.actions.detonate_file.request", request)
+    soar = _soar()
+    soar.vault = SimpleNamespace(get_attachment=lambda **_: [_attachment(SHA256)])
+    params = DetonateFileParams(vault_id="mock-vault-id")
+
+    with pytest.raises(ActionFailure, match="This file has already been uploaded"):
+        detonate_file.__wrapped__(params, soar, _asset())
+
+    assert request.call_count == 3
 
 
 @pytest.mark.parametrize(

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from httpx2 import RequestError
 from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
 from soar_sdk.asset import BaseAsset, AssetField
@@ -49,9 +50,24 @@ app = App(
 def test_connectivity(soar: SOARClient, asset: Asset) -> None:
     """Verify connectivity by searching Koodous APKs."""
     try:
-        request(asset, "GET", "/apks", params={"search": "Whatsapp"})
-    except Exception as exc:
-        raise ActionFailure(str(exc)) from exc
+        response = request(
+            asset, "GET", "/apks", params={"search": "Whatsapp"}, return_response=True
+        )
+    except RequestError as exc:
+        raise ActionFailure(f"Could not connect to Koodous: {exc}") from exc
+
+    if not response.is_success:
+        raise ActionFailure(
+            f"Koodous API returned HTTP {response.status_code}: {response.text}"
+        )
+
+    try:
+        listing = response.json()
+    except ValueError:
+        listing = None
+    if not isinstance(listing, dict) or not isinstance(listing.get("results"), list):
+        raise ActionFailure("Koodous API did not return a JSON APK listing")
+
     soar.set_message("Test connectivity passed")
 
 

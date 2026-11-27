@@ -15,10 +15,11 @@
 
 import re
 import time
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlsplit
 
-import httpx
+import httpx2
 from soar_sdk.auth import StaticTokenAuth
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import progress
@@ -40,7 +41,7 @@ def normalize_attempts(attempts: Any) -> Any:
     return attempts
 
 
-def _retry_after_seconds(response: httpx.Response) -> float | None:
+def _retry_after_seconds(response: httpx2.Response) -> float | None:
     """Read a numeric Retry-After value or Koodous' throttling detail."""
     retry_after = response.headers.get("Retry-After")
     if retry_after is not None:
@@ -66,7 +67,7 @@ def _sleep_with_progress(seconds: float, message: str) -> None:
         remaining -= sleep_interval
 
 
-def response_data(response: httpx.Response) -> Any:
+def response_data(response: httpx2.Response) -> Any:
     """Return a successful response body or raise the SDK's action failure."""
     if response.status_code == 405:
         return {}
@@ -106,7 +107,7 @@ def request(
     )
     retries = 0
     while True:
-        with httpx.Client(
+        with httpx2.Client(
             verify=asset.verify_server_cert if verify_ssl is None else verify_ssl,
             timeout=30 if timeout is None else timeout,
             auth=auth,
@@ -134,23 +135,40 @@ def request(
     return response_data(response)
 
 
-def report(
+def fetch_analysis(asset: Any, sha256: str) -> dict:
+    response = request(
+        asset,
+        "GET",
+        f"/apks/{sha256}/analysis",
+        return_response=True,
+        retry_rate_limited=True,
+    )
+    if response.status_code == 405:
+        raise ActionFailure("Koodous rejected the analysis report fetch (HTTP 405)")
+    return response_data(response)
+
+
+def poll_overview(
     asset: Any,
     soar: Any,
     sha256: str,
     attempts: int = 1,
     analysis_type: str = "all",
     last_yara_analysis_at: str | None = None,
-) -> tuple[dict, dict, bool]:
-    """Poll a file report and return overview and optional analysis."""
+    *,
+    on_overview: Callable[[dict], None] | None = None,
+) -> tuple[dict, bool]:
+    """Poll APK details until the requested analysis is ready."""
     overview: dict = {}
-    analysis: dict = {}
     complete = False
     for index in range(attempts):
         overview = request(asset, "GET", f"/apks/{sha256}", retry_rate_limited=True)
+        if on_overview is not None and overview:
+            on_overview(overview)
         if analysis_type == "yara":
-            if overview.get("last_yara_analysis_at") != last_yara_analysis_at:
-                return overview, {}, True
+            timestamp = overview.get("last_yara_analysis_at")
+            if timestamp and timestamp != last_yara_analysis_at:
+                return overview, True
         elif analysis_type in {"static", "dynamic"}:
             complete = bool(overview.get(f"is_{analysis_type}_analyzed"))
         else:
@@ -159,15 +177,9 @@ def report(
                 or overview.get("is_dynamic_analyzed")
             )
         if complete:
-            analysis = request(
-                asset,
-                "GET",
-                f"/apks/{sha256}/analysis",
-                retry_rate_limited=True,
-            )
             break
         if index < attempts - 1:
             message = f"Polling for report, on attempt {index + 1} of {attempts}"
             soar.set_message(message)
             _sleep_with_progress(30, message)
-    return overview, analysis, complete
+    return overview, complete

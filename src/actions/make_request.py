@@ -91,26 +91,35 @@ def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
         )
 
     endpoint = params.endpoint.strip()
-    parsed_endpoint = urlsplit(endpoint)
+    try:
+        parsed_endpoint = urlsplit(endpoint)
+    except ValueError as error:
+        raise ActionFailure("endpoint must be a relative Koodous API path") from error
     if parsed_endpoint.scheme or parsed_endpoint.netloc:
-        raise ValueError("endpoint must be a relative Koodous API path")
+        raise ActionFailure("endpoint must be a relative Koodous API path")
     path = parsed_endpoint.path
     if not path.startswith("/") or path.startswith("//"):
-        raise ValueError("endpoint path must begin with a single '/'")
+        raise ActionFailure("endpoint path must begin with a single '/'")
     if any(segment in {".", ".."} for segment in path.split("/")):
-        raise ValueError("endpoint must remain within the Koodous API")
+        raise ActionFailure("endpoint must remain within the Koodous API")
     query_parameters = parse_qsl(parsed_endpoint.query, keep_blank_values=True)
     extra_query_parameters = params.query_parameters or ""
     if extra_query_parameters.lstrip().startswith(("{", "[")):
         try:
             extra_query = json.loads(extra_query_parameters)
         except json.JSONDecodeError as error:
-            raise ValueError(
+            raise ActionFailure(
                 "query_parameters must be a JSON object or query string"
             ) from error
         if not isinstance(extra_query, dict):
-            raise ValueError("query_parameters must be a JSON object")
-        query_parameters.extend(extra_query.items())
+            raise ActionFailure("query_parameters must be a JSON object")
+        for key, value in extra_query.items():
+            values = value if isinstance(value, list) else [value]
+            if any(isinstance(item, (dict, list)) for item in values):
+                raise ActionFailure(
+                    "query_parameters values must be scalars or arrays of scalars"
+                )
+            query_parameters.extend((key, item) for item in values)
     else:
         query_parameters.extend(
             parse_qsl(extra_query_parameters.lstrip("?"), keep_blank_values=True)
