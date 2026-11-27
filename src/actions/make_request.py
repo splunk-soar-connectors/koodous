@@ -115,7 +115,7 @@ def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
             raise ActionFailure("query_parameters must be a JSON object")
         for key, value in extra_query.items():
             values = value if isinstance(value, list) else [value]
-            if any(isinstance(item, (dict, list)) for item in values):
+            if any(isinstance(item, dict | list) for item in values):
                 raise ActionFailure(
                     "query_parameters values must be scalars or arrays of scalars"
                 )
